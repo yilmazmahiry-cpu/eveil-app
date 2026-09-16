@@ -1,0 +1,18 @@
+{
+  "name": "eveil-server",
+  "version": "1.0.0",
+  "description": "Backend minimal qui appelle l'API Anthropic pour l'app Éveil. La clé API ne vit que côté serveur.",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.126.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0"
+  }
+}

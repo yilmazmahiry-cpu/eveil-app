@@ -40,6 +40,9 @@ Sans backend configuré, ces écrans affichent simplement un message d'erreur do
 reste de l'app (profil, calculs, journal, lune, arbre de vie, navigation) fonctionne
 entièrement hors-ligne.
 
+Le serveur est fourni dans [`server/`](server/README.md) — voir ce fichier pour le
+démarrer en local et connecter l'app dessus.
+
 ## Structure
 
 ```
@@ -58,7 +61,7 @@ src/
 
 ## Ce qui reste à faire
 
-- [ ] Construire et déployer le backend `/api/ai` (voir ci-dessus)
+- [x] Backend `/api/ai` (voir [`server/`](server/README.md)) — reste à déployer en ligne
 - [ ] Éphémérides astronomiques réelles pour le thème astral (Swiss Ephemeris ou
       équivalent), si une précision au-delà du signe solaire est souhaitée
 - [ ] Icônes et splash screen personnalisés aux couleurs de la marque
