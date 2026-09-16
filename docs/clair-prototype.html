@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Éveil — spiritualité au quotidien</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12142B;
+    --gold:#CBA35C;
+    --gold-soft:rgba(203,163,92,0.10);
+    --ink:#F5F1E6;
+    --ink-muted:#9295B5;
+    --border:rgba(203,163,92,0.22);
+    --serif:'Fraunces',serif;
+    --sans:'Karla',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:var(--sans);background:#0b0c1c;min-height:100vh;}
+  .page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px;background:radial-gradient(circle at 50% -10%, #1b1e3d 0%, #0b0c1c 55%);}
+  .phone{width:100%;max-width:400px;min-height:730px;background:var(--bg);border-radius:28px;border:1px solid rgba(203,163,92,0.16);box-shadow:0 30px 80px -24px rgba(0,0,0,0.65);overflow:hidden;position:relative;}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:30px 24px 40px;overflow-y:auto;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.28s ease, transform 0.28s ease;}
+  .screen.with-nav-padding{padding-bottom:96px;}
+  .screen.active{opacity:1;transform:translateY(0);pointer-events:auto;z-index:2;}
+  .serif{font-family:var(--serif);color:var(--ink);}
+  h1,h2{margin:0;color:var(--ink);}
+  p{color:var(--ink-muted);}
+  .logo-mark{color:var(--gold);width:26px;height:26px;}
+  .logo-row{display:flex;align-items:center;gap:9px;}
+  .logo-word{font-family:var(--serif);font-size:14.5px;color:var(--ink-muted);letter-spacing:0.02em;}
+
+  .field{display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:var(--ink-muted);}
+  .field input{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:13px 14px;color:var(--ink);font-family:var(--sans);font-size:15px;color-scheme:dark;}
+  .field input:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .optional-tag{font-size:11px;color:var(--ink-muted);opacity:0.7;margin-left:4px;font-weight:400;}
+
+  .wheel-picker{position:relative;display:flex;gap:2px;height:200px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,0.02);overflow:hidden;}
+  .wheel-highlight{position:absolute;left:8px;right:8px;top:50%;height:40px;transform:translateY(-50%);border-top:1px solid rgba(203,163,92,0.5);border-bottom:1px solid rgba(203,163,92,0.5);background:rgba(203,163,92,0.07);pointer-events:none;z-index:2;border-radius:8px;}
+  .wheel-col{flex:1;position:relative;-webkit-mask-image:linear-gradient(to bottom, transparent 0, black 70px, black 130px, transparent 200px);mask-image:linear-gradient(to bottom, transparent 0, black 70px, black 130px, transparent 200px);}
+  .wheel-scroll{height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;padding:80px 0;}
+  .wheel-scroll::-webkit-scrollbar{display:none;}
+  .wheel-item{height:40px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--serif);font-size:15px;color:var(--ink-muted);transition:color 0.15s;cursor:pointer;}
+  .wheel-item.selected{color:var(--gold);font-size:18px;font-weight:600;}
+  .wheel-picker-time{max-width:200px;margin:0 auto;}
+  .wheel-sep{flex:0 0 auto;width:14px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:var(--serif);font-size:18px;z-index:3;pointer-events:none;}
+
+  .btn-primary{width:100%;background:var(--gold);color:#1b1e3d;border:none;border-radius:14px;padding:15px 20px;font-family:var(--sans);font-weight:700;font-size:15px;cursor:pointer;margin-top:4px;}
+  .btn-primary:disabled{opacity:0.45;cursor:default;}
+  .btn-text{background:none;border:none;color:var(--gold);font-family:var(--sans);font-weight:700;font-size:13.5px;cursor:pointer;padding:0;margin-top:10px;}
+
+  .carte{border:1px solid var(--border);border-radius:18px;padding:22px 20px;background:linear-gradient(160deg, rgba(203,163,92,0.10), rgba(203,163,92,0.02));margin-top:8px;}
+  .carte h2{font-size:14.5px;font-weight:600;color:var(--ink-muted);font-family:var(--sans);margin-bottom:12px;}
+  .carte blockquote{margin:0;font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.55;color:var(--ink);}
+
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:2px;}
+  .tile{border:1px solid var(--border);border-radius:16px;padding:18px 16px;background:transparent;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:12px;color:var(--ink);min-height:108px;}
+  .tile:active{background:var(--gold-soft);}
+  .tile svg{width:21px;height:21px;color:var(--gold);}
+  .tile .tile-title{font-family:var(--serif);font-size:15.5px;}
+  .tile .tile-sub{font-family:var(--sans);font-size:12px;color:var(--ink-muted);line-height:1.35;}
+  .tile .display-num{font-family:var(--serif);font-size:26px;color:var(--gold);line-height:1;}
+
+  .screen-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+  .back-btn{background:none;border:none;color:var(--ink);cursor:pointer;padding:2px;display:flex;}
+  .back-btn svg{width:22px;height:22px;}
+  .screen-title{font-family:var(--serif);font-size:21px;}
+  .screen-intro{font-size:14px;line-height:1.55;margin:0 0 16px;}
+
+  .text-input{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--ink);font-family:var(--sans);font-size:15px;resize:vertical;}
+  .text-input:focus{outline:2px solid var(--gold);outline-offset:1px;}
+
+  .result-zone{margin-top:20px;}
+  .result-panel{border:1px solid var(--border);border-radius:16px;padding:18px;background:rgba(203,163,92,0.05);}
+  .result-panel p{font-family:var(--serif);font-style:italic;font-size:15.5px;line-height:1.6;margin:0;color:var(--ink);}
+
+  .loading-dots{display:flex;gap:6px;padding:6px 0;}
+  .loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:0.3;animation:pulse 1.2s infinite ease-in-out;}
+  .loading-dots span:nth-child(2){animation-delay:0.2s;}
+  .loading-dots span:nth-child(3){animation-delay:0.4s;}
+  @keyframes pulse{0%,80%,100%{opacity:0.25;transform:scale(0.85);}40%{opacity:1;transform:scale(1);}}
+
+  .bottomnav{position:absolute;left:0;right:0;bottom:0;display:none;justify-content:space-around;align-items:center;padding:14px 20px 18px;background:linear-gradient(0deg, var(--bg) 65%, rgba(18,20,43,0));border-top:1px solid rgba(203,163,92,0.12);z-index:10;}
+  .bottomnav.visible{display:flex;}
+  .navbtn{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ink-muted);font-family:var(--sans);font-size:11px;cursor:pointer;}
+  .navbtn svg{width:19px;height:19px;}
+  .navbtn.active{color:var(--gold);}
+
+  .journal-item{border-bottom:1px solid rgba(255,255,255,0.06);padding:15px 0;}
+  .journal-item:first-child{padding-top:0;}
+  .journal-item .jtype{font-size:12px;color:var(--gold);font-weight:700;}
+  .journal-item .jinput{font-size:13px;color:var(--ink-muted);margin:7px 0;line-height:1.4;}
+  .journal-item .jresult{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink);line-height:1.55;}
+  .journal-item .jdate{font-size:11px;color:var(--ink-muted);opacity:0.65;margin-top:7px;}
+  .jfav-btn{background:none;border:none;color:var(--gold);cursor:pointer;padding:2px;flex-shrink:0;}
+  .jfav-btn svg{width:16px;height:16px;display:block;}
+  .journal-tab, .ritual-tab{background:none;border:1px solid var(--border);border-radius:20px;padding:7px 16px;font-family:var(--sans);font-size:12.5px;color:var(--ink-muted);cursor:pointer;}
+  .journal-tab.active, .ritual-tab.active{background:var(--gold-soft);color:var(--gold);border-color:rgba(203,163,92,0.4);}
+  .ritual-content{display:none;}
+  .ritual-content.active{display:block;}
+
+  .feedback-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);gap:10px;}
+  .feedback-label{font-size:12.5px;color:var(--ink-muted);}
+  .feedback-btns{display:flex;gap:10px;flex-shrink:0;}
+  .feedback-btn{background:none;border:1px solid var(--border);border-radius:10px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--ink-muted);cursor:pointer;}
+  .feedback-btn svg{width:15px;height:15px;}
+  .feedback-btn.active{color:var(--gold);border-color:rgba(203,163,92,0.5);background:var(--gold-soft);}
+
+  .footnote{font-size:12px;color:var(--ink-muted);opacity:0.7;line-height:1.5;margin-top:22px;}
+
+  .moon-steps{display:flex;gap:6px;justify-content:center;margin:14px 0 4px;}
+  .moon-dot{width:8px;height:8px;border-radius:50%;background:rgba(203,163,92,0.25);}
+  .moon-dot.active{background:var(--gold);}
+  .oracle-name{font-family:var(--serif);font-size:19px;color:var(--gold);text-align:center;margin:14px 0 6px;}
+  .numero-grid{display:flex;flex-direction:column;gap:10px;margin:18px 0;}
+  .numero-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:10px;}
+  .numero-row .n-label{font-size:13.5px;color:var(--ink-muted);}
+  .numero-row .n-value{font-family:var(--serif);font-size:20px;color:var(--gold);}
+
+  .profil-row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid rgba(255,255,255,0.06);padding:12px 0;gap:12px;}
+  .profil-row .p-label{font-size:13px;color:var(--ink-muted);flex-shrink:0;}
+  .profil-row .p-value{font-family:var(--serif);font-size:14.5px;color:var(--ink);text-align:right;}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="phone" id="phone">
+
+    <!-- BIENVENUE -->
+    <div class="screen active" id="screen-bienvenue">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+        <svg class="logo-mark" style="width:46px;height:46px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <h1 class="serif" style="font-size:36px;margin:22px 0 12px;">Éveil</h1>
+        <p style="font-size:14.5px;line-height:1.6;max-width:250px;">Ton espace quotidien pour explorer les signes, les cycles et les messages qui t'entourent.</p>
+      </div>
+      <button type="button" id="btn-bienvenue-commencer" class="btn-primary">Découvrir Éveil</button>
+    </div>
+
+    <!-- ONBOARDING -->
+    <div class="screen" id="screen-onboarding">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+        <svg class="logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <h1 class="serif" style="font-size:26px;margin:16px 0 8px;">Avant de commencer</h1>
+        <p style="font-size:14px;line-height:1.55;margin:0 0 20px;">Quelques informations pour personnaliser tes lectures.</p>
+        <div id="onboarding-form" style="display:flex;flex-direction:column;gap:14px;">
+          <label class="field">
+            <span>Ton prénom</span>
+            <input type="text" id="input-prenom" placeholder="Camille">
+          </label>
+          <label class="field">
+            <span>Ton nom de famille <span class="optional-tag">(facultatif)</span></span>
+            <input type="text" id="input-nom" placeholder="Martin">
+          </label>
+          <label class="field">
+            <span>Ta date de naissance</span>
+            <div class="wheel-picker" id="wheel-container-input"></div>
+          </label>
+          <label class="field">
+            <span>Heure de naissance <span class="optional-tag">(facultatif)</span></span>
+            <div class="wheel-picker wheel-picker-time" id="wheel-container-input-time"></div>
+          </label>
+          <label class="field">
+            <span>Lieu de naissance <span class="optional-tag">(facultatif)</span></span>
+            <input type="text" id="input-lieu" placeholder="Paris, France">
+          </label>
+          <p id="onboarding-error" style="display:none;color:#E0A48C;font-size:13px;margin:0;"></p>
+          <button type="button" id="btn-commencer" class="btn-primary">Commencer</button>
+        </div>
+        <p class="footnote">Éveil est un espace d'inspiration et de réflexion personnelle, pas une source de vérité absolue.</p>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="screen with-nav-padding" id="screen-home">
+      <div class="logo-row">
+        <svg class="logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <span class="logo-word">Éveil</span>
+      </div>
+      <h1 class="serif" id="home-greeting" style="font-size:25px;margin:16px 0 3px;"></h1>
+      <p id="home-subtitle" style="font-size:14px;margin:0 0 2px;"></p>
+      <p id="home-streak" style="font-size:12.5px;color:var(--gold);margin:0 0 22px;"></p>
+
+      <div class="carte" id="rituals-panel">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="ritual-tab active" data-ritual="carte">Carte</button>
+          <button class="ritual-tab" data-ritual="intention">Intention</button>
+          <button class="ritual-tab" data-ritual="gratitude">Gratitude</button>
+        </div>
+
+        <div id="ritual-content-carte" class="ritual-content active">
+          <div id="carte-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+          <div style="display:flex;gap:18px;margin-top:10px;">
+            <button class="btn-text" id="btn-nouvelle-carte" style="display:none;margin-top:0;">Nouvelle carte</button>
+            <button class="btn-text" id="btn-partager-carte" style="display:none;margin-top:0;">Partager</button>
+          </div>
+        </div>
+
+        <div id="ritual-content-intention" class="ritual-content"></div>
+
+        <div id="ritual-content-gratitude" class="ritual-content">
+          <p style="font-size:13.5px;margin:0 0 12px;color:var(--ink);">3 choses pour lesquelles tu es reconnaissant(e) aujourd'hui :</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <input type="text" id="gratitude-1" class="text-input" placeholder="1.">
+            <input type="text" id="gratitude-2" class="text-input" placeholder="2.">
+            <input type="text" id="gratitude-3" class="text-input" placeholder="3.">
+          </div>
+          <button class="btn-primary" id="btn-gratitude-save" style="margin-top:12px;">Enregistrer</button>
+          <p id="gratitude-saved-msg" style="display:none;color:var(--gold);font-size:12.5px;margin-top:10px;">Enregistré pour aujourd'hui ✨</p>
+        </div>
+      </div>
+
+      <h2 class="serif" style="font-size:16.5px;margin:30px 0 14px;">Au quotidien</h2>
+      <div class="tiles">
+        <button class="tile" data-screen="heures">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <span class="tile-title">Heures miroir</span>
+          <span class="tile-sub">11:11, 22:22… ce qu'elles révèlent</span>
+        </button>
+        <button class="tile" data-screen="signe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 3.76a6 6 0 0 1 0 8.49l-8.49 8.49a6 6 0 0 1-8.49-8.49l8.49-8.49a6 6 0 0 1 8.49 0z"/><path d="M12 20v-8"/><path d="M8 16h4"/></svg>
+          <span class="tile-title">Un signe</span>
+          <span class="tile-sub">Un animal, un objet, une coïncidence…</span>
+        </button>
+        <button class="tile" data-screen="reve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          <span class="tile-title">Un rêve</span>
+          <span class="tile-sub">Raconte-le, on en explore le sens</span>
+        </button>
+        <button class="tile" data-screen="lune">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5L12 2z"/></svg>
+          <span class="tile-title">Lune &amp; Oracle</span>
+          <span class="tile-sub">Phase du jour et carte tirée pour toi</span>
+        </button>
+      </div>
+
+      <h2 class="serif" style="font-size:16.5px;margin:30px 0 14px;">Te connaître</h2>
+      <div class="tiles">
+        <button class="tile" id="tile-numero" data-screen="numero">
+          <span class="display-num" id="tile-numero-value"></span>
+          <span class="tile-title">Numérologie</span>
+        </button>
+        <button class="tile" data-screen="theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+          <span class="tile-title">Thème astral</span>
+          <span class="tile-sub">Une lecture inspirée par ton profil</span>
+        </button>
+        <button class="tile" data-screen="arbrevie">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V13"/><path d="M12 13C8 13 5 10 5 6c2 0 4 1 5 3 0-3 1-5 2-7 1 2 2 4 2 7 1-2 3-3 5-3 0 4-3 7-7 7z"/></svg>
+          <span class="tile-title">Arbre de vie</span>
+          <span class="tile-sub">Explore les dix séphiroth kabbalistiques</span>
+        </button>
+      </div>
+
+      <h2 class="serif" style="font-size:16.5px;margin:30px 0 14px;">Créer &amp; relier</h2>
+      <div class="tiles">
+        <button class="tile" data-screen="manifestation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+          <span class="tile-title">Manifestation</span>
+          <span class="tile-sub">Pose une intention, active la loi de l'attraction</span>
+        </button>
+        <button class="tile" data-screen="compat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="6"/><circle cx="15" cy="12" r="6"/></svg>
+          <span class="tile-title">Compatibilité</span>
+          <span class="tile-sub">Toi et une autre personne</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- HEURES MIROIR -->
+    <div class="screen" id="screen-heures">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Heures miroir</h1>
+      </div>
+      <p class="screen-intro">Quelle heure as-tu remarquée ?</p>
+      <input type="text" id="input-heures" class="text-input" placeholder="Ex : 11:11">
+      <button class="btn-primary" id="btn-heures">Découvrir le sens</button>
+      <div id="result-heures" class="result-zone"></div>
+    </div>
+
+    <!-- REVE -->
+    <div class="screen" id="screen-reve">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Interpréter un rêve</h1>
+      </div>
+      <p class="screen-intro">Décris ton rêve, avec ce dont tu te souviens.</p>
+      <textarea id="input-reve" class="text-input" rows="5" placeholder="J'étais dans une maison que je ne connaissais pas…"></textarea>
+      <button class="btn-primary" id="btn-reve">Découvrir le sens</button>
+      <div id="result-reve" class="result-zone"></div>
+    </div>
+
+    <!-- SIGNE -->
+    <div class="screen" id="screen-signe">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Un signe</h1>
+      </div>
+      <p class="screen-intro">Qu'as-tu remarqué ?</p>
+      <textarea id="input-signe" class="text-input" rows="5" placeholder="Un papillon orange est passé devant moi à 15h33…"></textarea>
+      <button class="btn-primary" id="btn-signe">Découvrir le sens</button>
+      <div id="result-signe" class="result-zone"></div>
+    </div>
+
+    <!-- NUMERO -->
+    <div class="screen" id="screen-numero">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Numérologie</h1>
+      </div>
+      <div style="text-align:center;margin:10px 0 6px;">
+        <span class="serif" id="numero-big" style="font-size:52px;color:var(--gold);line-height:1;"></span>
+      </div>
+      <p class="screen-intro" id="numero-text" style="text-align:center;"></p>
+      <div class="numero-grid">
+        <div class="numero-row"><span class="n-label">Nombre d'expression</span><span class="n-value" id="numero-expression"></span></div>
+        <div class="numero-row"><span class="n-label">Nombre de l'âme</span><span class="n-value" id="numero-ame"></span></div>
+        <div class="numero-row"><span class="n-label">Nombre de personnalité</span><span class="n-value" id="numero-personnalite"></span></div>
+      </div>
+      <button class="btn-primary" id="btn-numero-plus">Lecture numérologique complète</button>
+      <div id="result-numero" class="result-zone"></div>
+    </div>
+
+    <!-- LUNE & ORACLE -->
+    <div class="screen" id="screen-lune">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Lune &amp; Oracle</h1>
+      </div>
+      <div style="text-align:center;">
+        <p class="serif" id="lune-phase-name" style="font-size:19px;margin:6px 0 2px;"></p>
+        <div class="moon-steps" id="moon-steps"></div>
+        <p id="lune-ritual" style="font-size:13px;margin:10px 0 0;"></p>
+      </div>
+      <div class="carte" style="margin-top:22px;">
+        <h2>Carte oracle du jour</h2>
+        <p class="oracle-name" id="oracle-name"></p>
+        <p style="text-align:center;font-size:13.5px;margin:0;" id="oracle-sens"></p>
+      </div>
+      <button class="btn-primary" id="btn-lune-plus" style="margin-top:18px;">Lecture du jour</button>
+      <div id="result-lune" class="result-zone"></div>
+    </div>
+
+    <!-- THEME ASTRAL -->
+    <div class="screen" id="screen-theme">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Thème astral</h1>
+      </div>
+      <p class="screen-intro" style="text-align:center;">Basé sur ton signe solaire : <span class="serif" id="theme-signe" style="color:var(--gold);"></span></p>
+      <p class="screen-intro" id="theme-info" style="text-align:center;font-size:12.5px;"></p>
+      <button class="btn-primary" id="btn-theme-plus" style="margin-top:10px;">Découvrir mon thème</button>
+      <div id="result-theme" class="result-zone"></div>
+    </div>
+
+    <!-- COMPATIBILITE -->
+    <div class="screen" id="screen-compat">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Compatibilité</h1>
+      </div>
+      <p class="screen-intro">Renseigne les informations de l'autre personne.</p>
+      <label class="field">
+        <span>Son prénom</span>
+        <input type="text" id="compat-prenom" placeholder="Alex" class="text-input">
+      </label>
+      <label class="field" style="margin-top:14px;">
+        <span>Sa date de naissance</span>
+        <div class="wheel-picker" id="wheel-container-compat"></div>
+      </label>
+      <p id="compat-error" style="display:none;color:#E0A48C;font-size:13px;margin:10px 0 0;"></p>
+      <button class="btn-primary" id="btn-compat" style="margin-top:16px;">Voir la compatibilité</button>
+      <div id="result-compat" class="result-zone"></div>
+    </div>
+
+    <!-- ARBRE DE VIE -->
+    <div class="screen" id="screen-arbrevie">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Arbre de vie</h1>
+      </div>
+      <p class="screen-intro" style="text-align:center;">Explore les dix séphiroth et découvre celle qui résonne avec toi aujourd'hui.</p>
+      <div style="display:flex;justify-content:center;margin-bottom:16px;">
+        <svg id="sephirot-tree" viewBox="0 0 300 320" style="width:100%;max-width:260px;height:auto;"></svg>
+      </div>
+      <div id="sephira-info" class="carte"></div>
+      <button class="btn-primary" id="btn-sephira-lecture" style="margin-top:14px;">Lecture personnalisée</button>
+      <div id="result-arbrevie" class="result-zone"></div>
+    </div>
+
+    <!-- MANIFESTATION -->
+    <div class="screen" id="screen-manifestation">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Manifestation</h1>
+      </div>
+      <p class="screen-intro">Qu'est-ce que tu veux attirer ou créer dans ta vie ?</p>
+      <textarea id="input-manifestation" class="text-input" rows="4" placeholder="Plus de confiance en moi, une opportunité professionnelle, une relation épanouissante…"></textarea>
+      <button class="btn-primary" id="btn-manifestation">Créer mon intention</button>
+      <div id="result-manifestation" class="result-zone"></div>
+      <button class="btn-text" id="btn-open-affirmations" style="margin-top:20px;">Parcourir la bibliothèque d'affirmations</button>
+    </div>
+
+    <!-- BIBLIOTHEQUE D'AFFIRMATIONS -->
+    <div class="screen" id="screen-affirmations">
+      <div class="screen-header">
+        <button class="back-btn" data-back data-back-to="manifestation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Bibliothèque d'affirmations</h1>
+      </div>
+      <p class="screen-intro">Des affirmations pensées pour toi.</p>
+      <div id="affirmations-list"></div>
+      <button class="btn-text" id="btn-nouvelles-affirmations" style="margin-top:16px;">Nouvelles affirmations</button>
+    </div>
+
+    <!-- PARTAGE -->
+    <div class="screen" id="screen-partage">
+      <div class="screen-header">
+        <button class="back-btn" data-back><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <h1 class="screen-title serif">Partager</h1>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:20px;padding:30px 22px;background:linear-gradient(160deg, rgba(203,163,92,0.14), rgba(203,163,92,0.02));text-align:center;">
+        <svg class="logo-mark" style="margin:0 auto 14px;display:block;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <p id="partage-date" style="font-size:12px;color:var(--ink-muted);margin:0 0 16px;"></p>
+        <blockquote id="partage-text" style="font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.6;color:var(--ink);margin:0 0 18px;"></blockquote>
+        <p class="serif" style="color:var(--gold);font-size:14px;margin:0;">Éveil</p>
+      </div>
+      <p class="screen-intro" style="text-align:center;margin-top:20px;">Fais une capture d'écran de cette carte pour la partager où tu veux.</p>
+    </div>
+
+    <!-- JOURNAL -->
+    <div class="screen with-nav-padding" id="screen-journal">
+      <div class="logo-row" style="margin-bottom:20px;">
+        <svg class="logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <span class="logo-word">Éveil</span>
+      </div>
+      <h1 class="serif" style="font-size:23px;margin:0 0 18px;">Ton journal</h1>
+      <div class="carte" id="journal-stats-panel" style="margin-bottom:20px;">
+        <h2>Ce mois-ci</h2>
+        <p id="journal-stats-text" style="font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);margin:0;line-height:1.5;"></p>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:18px;">
+        <button class="journal-tab active" data-filter="all">Tout</button>
+        <button class="journal-tab" data-filter="fav">Favoris</button>
+      </div>
+      <div id="journal-list"></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="screen with-nav-padding" id="screen-profil">
+      <div class="logo-row" style="margin-bottom:20px;">
+        <svg class="logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.3"/><circle cx="15.3" cy="8.7" r="1.6" fill="currentColor" stroke="none"/></svg>
+        <span class="logo-word">Éveil</span>
+      </div>
+      <h1 class="serif" style="font-size:23px;margin:0 0 18px;">Ton profil</h1>
+
+      <div id="profil-view">
+        <div class="profil-row"><span class="p-label">Prénom</span><span class="p-value" id="profil-prenom"></span></div>
+        <div class="profil-row"><span class="p-label">Nom</span><span class="p-value" id="profil-nom"></span></div>
+        <div class="profil-row"><span class="p-label">Date de naissance</span><span class="p-value" id="profil-date"></span></div>
+        <div class="profil-row"><span class="p-label">Heure de naissance</span><span class="p-value" id="profil-heure"></span></div>
+        <div class="profil-row"><span class="p-label">Lieu de naissance</span><span class="p-value" id="profil-lieu"></span></div>
+        <div class="profil-row"><span class="p-label">Signe</span><span class="p-value" id="profil-signe"></span></div>
+        <div class="profil-row"><span class="p-label">Chemin de vie</span><span class="p-value" id="profil-chemin"></span></div>
+
+        <button class="btn-primary" id="btn-profil-modifier" style="margin-top:22px;">Modifier mes informations</button>
+        <button class="btn-text" id="btn-profil-supprimer" style="margin-top:14px;color:#E0A48C;">Supprimer mon profil</button>
+
+        <div id="profil-confirm-delete" style="display:none;margin-top:16px;">
+          <div class="result-panel" style="background:rgba(224,164,140,0.08);border-color:rgba(224,164,140,0.35);">
+            <p style="font-family:var(--sans);font-style:normal;font-size:13.5px;color:var(--ink);">Cette action supprimera définitivement ton profil et ton journal, sans possibilité de retour en arrière.</p>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:12px;">
+            <button class="btn-primary" id="btn-confirm-delete" style="background:#E0A48C;">Oui, supprimer</button>
+            <button class="btn-text" id="btn-cancel-delete">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="profil-edit" style="display:none;">
+        <label class="field"><span>Ton prénom</span><input type="text" id="pedit-prenom" class="text-input"></label>
+        <label class="field" style="margin-top:14px;"><span>Ton nom de famille</span><input type="text" id="pedit-nom" class="text-input"></label>
+        <label class="field" style="margin-top:14px;"><span>Ta date de naissance</span>
+          <div class="wheel-picker" id="wheel-container-pedit"></div>
+        </label>
+        <label class="field" style="margin-top:14px;"><span>Heure de naissance <span class="optional-tag">(facultatif)</span></span>
+          <div class="wheel-picker wheel-picker-time" id="wheel-container-pedit-time"></div>
+        </label>
+        <label class="field" style="margin-top:14px;"><span>Lieu de naissance <span class="optional-tag">(facultatif)</span></span><input type="text" id="pedit-lieu" class="text-input"></label>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn-primary" id="btn-profil-enregistrer">Enregistrer</button>
+          <button class="btn-text" id="btn-profil-annuler">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottomnav" id="bottomnav">
+      <button class="navbtn" data-nav="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        <span>Accueil</span>
+      </button>
+      <button class="navbtn" data-nav="journal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5v-17z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg>
+        <span>Journal</span>
+      </button>
+      <button class="navbtn" data-nav="profil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <span>Profil</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let profile = null;
+let journal = [];
+let luneContext = null;
+let currentCarteText = '';
+let journalFilter = 'all';
+let selectedSephira = null;
+const SEPHIROT = [
+  {key:'keter', name:'Keter', trad:'La Couronne', x:150, y:20, theme:"L'unité originelle, la volonté pure, la source de tout ce qui existe."},
+  {key:'chokmah', name:'Chokmah', trad:'La Sagesse', x:200, y:65, theme:"L'intuition brute, l'étincelle créatrice, l'élan avant la forme."},
+  {key:'binah', name:'Binah', trad:'La Compréhension', x:100, y:65, theme:"La structure, le discernement, la capacité à donner forme aux idées."},
+  {key:'chesed', name:'Chesed', trad:'La Bonté', x:200, y:135, theme:"L'amour inconditionnel, la générosité, l'expansion sans limite."},
+  {key:'gevurah', name:'Gevurah', trad:'La Rigueur', x:100, y:135, theme:"La discipline, les limites nécessaires, la force de dire non."},
+  {key:'tiferet', name:'Tiferet', trad:'La Beauté', x:150, y:170, theme:"L'équilibre, l'harmonie du cœur, le point de rencontre entre toutes les forces."},
+  {key:'netzach', name:'Netzach', trad:"L'Éternité", x:200, y:205, theme:"Le désir, l'endurance, l'élan émotionnel qui pousse à avancer."},
+  {key:'hod', name:'Hod', trad:'La Splendeur', x:100, y:205, theme:"L'intellect, la communication, l'humilité face au savoir."},
+  {key:'yesod', name:'Yesod', trad:'Le Fondement', x:150, y:245, theme:"L'inconscient, le pont entre l'idée et sa réalisation concrète."},
+  {key:'malkuth', name:'Malkuth', trad:'Le Royaume', x:150, y:295, theme:"Le monde matériel, le corps, la manifestation tangible de tout le reste."}
+];
+const SEPHIROT_PATHS = [
+  ['keter','chokmah'],['keter','binah'],['keter','tiferet'],
+  ['chokmah','binah'],['chokmah','tiferet'],['chokmah','chesed'],
+  ['binah','tiferet'],['binah','gevurah'],
+  ['chesed','gevurah'],['chesed','tiferet'],['chesed','netzach'],
+  ['gevurah','tiferet'],['gevurah','hod'],
+  ['tiferet','netzach'],['tiferet','hod'],['tiferet','yesod'],
+  ['netzach','hod'],['netzach','yesod'],['netzach','malkuth'],
+  ['hod','yesod'],['hod','malkuth'],
+  ['yesod','malkuth']
+];
+const WHEEL_ITEM_HEIGHT = 40;
+
+const CHEMIN_VIE_TEXTS = {
+  1:"Le chemin de l'initiateur : indépendance, leadership et besoin de tracer sa propre voie.",
+  2:"Le chemin du diplomate : sensibilité, écoute et goût pour l'harmonie avec les autres.",
+  3:"Le chemin du créatif : expression, joie de vivre et communication.",
+  4:"Le chemin du bâtisseur : rigueur, sens du concret et besoin de stabilité.",
+  5:"Le chemin du libre : soif de changement, curiosité et goût de l'aventure.",
+  6:"Le chemin du protecteur : attachement aux proches, sens des responsabilités.",
+  7:"Le chemin du chercheur : introspection, spiritualité et quête de sens.",
+  8:"Le chemin du bâtisseur ambitieux : réussite, organisation et sens du pouvoir personnel.",
+  9:"Le chemin de l'humaniste : générosité, ouverture au monde et idéal élevé.",
+  11:"Un chemin maître : intuition puissante et mission d'inspirer les autres.",
+  22:"Un chemin maître : la capacité de bâtir grand et de concrétiser des idéaux.",
+  33:"Un chemin maître : une vocation à guider et transmettre par l'amour inconditionnel."
+};
+
+const ORACLE_CARDS = [
+  {name:"Le Lâcher-prise", sens:"Accepte ce que tu ne peux contrôler et fais confiance au mouvement de la vie."},
+  {name:"La Lumière intérieure", sens:"Ta clarté est déjà là ; il s'agit de l'écouter plus que de la chercher."},
+  {name:"Le Nouveau départ", sens:"Une page se tourne ; ce qui commence mérite ton attention pleine."},
+  {name:"La Guérison", sens:"Un espace se répare doucement en toi, sans que tu aies besoin de forcer."},
+  {name:"La Patience", sens:"Ce que tu attends prend le temps qu'il lui faut pour mûrir."},
+  {name:"L'Abondance", sens:"Les ressources, matérielles ou intérieures, circulent vers toi."},
+  {name:"La Vérité", sens:"Une clarté que tu évitais peut-être est prête à être regardée en face."},
+  {name:"La Protection", sens:"Tu es entouré(e) plus que tu ne le perçois en ce moment."},
+  {name:"Le Choix", sens:"Une décision attend d'être prise ; écoute ce que ton corps en dit."},
+  {name:"La Connexion", sens:"Une relation ou une rencontre a quelque chose à t'apprendre en ce moment."},
+  {name:"Le Repos", sens:"Ton énergie te demande une pause avant de repartir."},
+  {name:"La Créativité", sens:"Une idée cherche à naître à travers toi ; laisse-lui de l'espace."},
+  {name:"L'Équilibre", sens:"Quelque chose penche trop d'un côté dans ta vie en ce moment."},
+  {name:"La Confiance", sens:"Le doute que tu ressens n'efface pas ce que tu sais déjà, au fond."},
+  {name:"La Transformation", sens:"Ce qui se termine libère de la place pour ce qui vient."},
+  {name:"La Gratitude", sens:"Ce que tu as déjà mérite d'être vu avant de désirer autre chose."},
+  {name:"L'Intuition", sens:"Ta première impression sur une situation était plus juste que tu ne le penses."},
+  {name:"Le Courage", sens:"Une peur précise te montre exactement où se trouve ton prochain pas."},
+  {name:"L'Alignement", sens:"Tes actions et tes valeurs se rapprochent en ce moment."},
+  {name:"La Douceur", sens:"Tu peux avancer sans te brusquer ni brusquer les autres."}
+];
+
+const MOON_PHASE_NAMES = ["Nouvelle lune","Premier croissant","Premier quartier","Lune gibbeuse croissante","Pleine lune","Lune gibbeuse décroissante","Dernier quartier","Dernier croissant"];
+const MOON_RITUALS = [
+  "Pose une intention claire à l'écrit pour le cycle qui commence.",
+  "Fais un premier petit geste concret vers cette intention.",
+  "Un obstacle se présente peut-être : ajuste sans abandonner.",
+  "Affine ce qui est en cours, sans te précipiter.",
+  "Observe ce qui arrive à maturité, et ce qu'il est temps de célébrer.",
+  "Fais le tri : garde ce qui te sert encore.",
+  "Lâche consciemment ce qui doit se terminer.",
+  "Repose-toi avant que le prochain cycle ne commence."
+];
+
+const LETTER_GROUPS = [["A","J","S"],["B","K","T"],["C","L","U"],["D","M","V"],["E","N","W"],["F","O","X"],["G","P","Y"],["H","Q","Z"],["I","R"]];
+const LETTER_VALUES = {};
+LETTER_GROUPS.forEach((group,i)=>{ group.forEach(l=>{ LETTER_VALUES[l]=i+1; }); });
+const VOYELLES = ["A","E","I","O","U"];
+
+const MOIS_LABELS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+const MOIS_LABELS_MIN = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const JOURNAL_LABELS = { heures:'Heure miroir', reve:'Rêve', signe:'Signe', numero:'Numérologie', lune:'Lune & Oracle', theme:'Thème astral', compat:'Compatibilité', manifestation:'Manifestation', sephira:'Arbre de vie' };
+
+const SYSTEM_PROMPT_GENERAL = "Tu es la voix de \"Éveil\", une application de spiritualité bienveillante. Tu t'inspires de la philosophie de la loi de l'attraction (dans l'esprit d'ouvrages sur le pouvoir créateur de l'esprit, comme celui de Rhonda Byrne) : l'idée que les pensées et les émotions de la personne influencent ce qu'elle attire dans sa vie, que l'univers répond à son énergie intérieure, et qu'elle porte en elle un pouvoir de création sur sa réalité. Tu donnes des interprétations symboliques et poétiques (heures miroir, rêves, signes, numérologie, astrologie, manifestation) qui relient le message reçu à cette idée : ce que la personne vit est aussi le reflet de ce qu'elle porte intérieurement, et elle a le pouvoir d'orienter la suite en alignant ses pensées, ses émotions et sa gratitude. Présente cela comme des pistes de réflexion et non des vérités absolues. Réponds toujours en français, en tutoyant la personne, dans un style chaleureux, imagé et concis (100 à 150 mots). Ne donne jamais de diagnostic médical, de conseil financier ou juridique, ni de prédiction alarmante (maladie, mort, catastrophe). Termine si pertinent par une courte invitation à l'action intérieure : une intention à poser, un ressenti de gratitude, ou une image à visualiser.";
+
+const SYSTEM_PROMPT_CARTE = "Tu es la voix de \"Éveil\", une application de spiritualité bienveillante. Tu rédiges une courte carte du jour dans l'esprit de la loi de l'attraction : une affirmation positive formulée au présent, comme si ce qui est désiré était déjà en train de se réaliser, liée à la confiance en soi, à l'attractivité personnelle et au pouvoir de la personne de créer sa réalité par ses pensées et ses émotions. Inspire-toi de l'esprit d'ouvrages comme celui de Rhonda Byrne sans jamais citer ou reproduire de texte existant. Réponds en français, en tutoyant la personne par son prénom, dans un style chaleureux et poétique, en 2 à 4 phrases maximum, sans guillemets autour du texte.";
+
+const SYSTEM_PROMPT_AFFIRMATIONS = "Tu es la voix de \"Éveil\", une application de spiritualité bienveillante inspirée de la loi de l'attraction. Tu rédiges des affirmations positives courtes, formulées à la première personne et au présent, comme si ce qui est désiré était déjà acquis. Réponds uniquement par la liste demandée, une affirmation par ligne, sans numéros, sans tirets, sans guillemets, sans introduction ni conclusion, toujours en français.";
+
+const FEATURE_CONFIG = {
+  heures:{ buildPrompt:(v)=>`${profile.prenom} (signe : ${profile.signe}) vient de remarquer l'heure miroir ${v}. Donne une interprétation symbolique et personnalisée de cette heure miroir.` },
+  reve:{ buildPrompt:(v)=>`${profile.prenom} (signe : ${profile.signe}) a fait le rêve suivant : "${v}". Propose une interprétation symbolique de ce rêve.` },
+  signe:{ buildPrompt:(v)=>`${profile.prenom} (signe : ${profile.signe}) a remarqué ceci dans son quotidien : "${v}". Donne une interprétation spirituelle de ce signe ou de cette synchronicité.` },
+  manifestation:{ buildPrompt:(v)=>`${profile.prenom} (signe : ${profile.signe}) souhaite attirer ou créer ceci dans sa vie : "${v}". En t'inspirant de la loi de l'attraction, reformule ce désir en une intention positive au présent, comme si c'était déjà en train de se réaliser, et donne une piste concrète pour aligner ses pensées et ses émotions avec cette intention aujourd'hui.` }
+};
+
+function getSigne(m,d){
+  if((m==3&&d>=21)||(m==4&&d<=19)) return "Bélier";
+  if((m==4&&d>=20)||(m==5&&d<=20)) return "Taureau";
+  if((m==5&&d>=21)||(m==6&&d<=20)) return "Gémeaux";
+  if((m==6&&d>=21)||(m==7&&d<=22)) return "Cancer";
+  if((m==7&&d>=23)||(m==8&&d<=22)) return "Lion";
+  if((m==8&&d>=23)||(m==9&&d<=22)) return "Vierge";
+  if((m==9&&d>=23)||(m==10&&d<=22)) return "Balance";
+  if((m==10&&d>=23)||(m==11&&d<=21)) return "Scorpion";
+  if((m==11&&d>=22)||(m==12&&d<=21)) return "Sagittaire";
+  if((m==12&&d>=22)||(m==1&&d<=19)) return "Capricorne";
+  if((m==1&&d>=20)||(m==2&&d<=18)) return "Verseau";
+  return "Poissons";
+}
+
+function reduceNumber(n){
+  while(n>9 && n!==11 && n!==22 && n!==33){
+    n = String(n).split('').reduce((a,b)=>a+Number(b),0);
+  }
+  return n;
+}
+
+function getCheminVie(dateStr){
+  const digits = dateStr.replace(/-/g,'').split('').map(Number);
+  return reduceNumber(digits.reduce((a,b)=>a+b,0));
+}
+
+function normalizeName(str){
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,'');
+}
+function getNombreExpression(fullName){
+  const letters = normalizeName(fullName).split('');
+  const sum = letters.reduce((a,l)=>a+(LETTER_VALUES[l]||0),0);
+  return reduceNumber(sum);
+}
+function getNombreAme(fullName){
+  const letters = normalizeName(fullName).split('').filter(l=>VOYELLES.includes(l));
+  const sum = letters.reduce((a,l)=>a+(LETTER_VALUES[l]||0),0);
+  return reduceNumber(sum);
+}
+function getNombrePersonnalite(fullName){
+  const letters = normalizeName(fullName).split('').filter(l=>!VOYELLES.includes(l));
+  const sum = letters.reduce((a,l)=>a+(LETTER_VALUES[l]||0),0);
+  return reduceNumber(sum);
+}
+
+function getMoonPhaseFraction(date){
+  const synodic = 29.53058867;
+  const knownNewMoon = Date.UTC(2000,0,6,18,14,0);
+  const diffDays = (date.getTime() - knownNewMoon) / 86400000;
+  let frac = (diffDays % synodic) / synodic;
+  if(frac<0) frac += 1;
+  return frac;
+}
+function getMoonPhaseIndex(frac){
+  if(frac<0.03 || frac>=0.97) return 0;
+  if(frac<0.22) return 1;
+  if(frac<0.28) return 2;
+  if(frac<0.47) return 3;
+  if(frac<0.53) return 4;
+  if(frac<0.72) return 5;
+  if(frac<0.78) return 6;
+  return 7;
+}
+function simpleHash(str){
+  let h=0;
+  for(let i=0;i<str.length;i++){ h = (h*31 + str.charCodeAt(i)) >>> 0; }
+  return h;
+}
+function makeId(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+function escapeHTML(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function loadingDotsHTML(){ return '<div class="loading-dots"><span></span><span></span><span></span></div>'; }
+function resultPanelHTML(text){ return `<div class="result-panel"><p>${escapeHTML(text)}</p></div>`; }
+function errorHTML(){ return '<div class="result-panel"><p style="font-style:normal;color:var(--ink-muted);">Une petite interférence dans les signaux… réessaie dans un instant.</p></div>'; }
+function formatDateShort(iso){ return new Date(iso).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }
+function formatDateLongFR(dateStr){
+  const [y,m,d] = dateStr.split('-').map(Number);
+  return `${d} ${MOIS_LABELS_MIN[m-1]} ${y}`;
+}
+function feedbackWidgetHTML(entryId){
+  return `<div class="feedback-row" data-entry-id="${entryId}">
+    <span class="feedback-label">Cette lecture t'a parlé ?</span>
+    <div class="feedback-btns">
+      <button class="feedback-btn" data-value="up" aria-label="Oui"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 22V11l5-8 1 1v6h6l-2 12H9a2 2 0 0 1-2-2z"/></svg></button>
+      <button class="feedback-btn" data-value="down" aria-label="Non" style="transform:scaleY(-1);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 22V11l5-8 1 1v6h6l-2 12H9a2 2 0 0 1-2-2z"/></svg></button>
+    </div>
+  </div>`;
+}
+
+async function askIA(userPrompt, systemPrompt){
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      model:"claude-sonnet-4-6",
+      max_tokens:1000,
+      system: systemPrompt,
+      messages:[{role:"user", content:userPrompt}]
+    })
+  });
+  const data = await response.json();
+  if(!data || !data.content) throw new Error('Réponse invalide');
+  return data.content.map(b=>b.text||'').join('\n').trim();
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const nav = document.getElementById('bottomnav');
+  if(name==='home' || name==='journal' || name==='profil'){
+    nav.classList.add('visible');
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active', b.dataset.nav===name));
+  } else {
+    nav.classList.remove('visible');
+  }
+}
+
+/* ---------- WHEEL PICKERS ---------- */
+function buildWheelPicker(containerId, prefix){
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <div class="wheel-highlight"></div>
+    <div class="wheel-col"><div class="wheel-scroll" id="wheel-${prefix}-jour"></div></div>
+    <div class="wheel-col"><div class="wheel-scroll" id="wheel-${prefix}-mois"></div></div>
+    <div class="wheel-col"><div class="wheel-scroll" id="wheel-${prefix}-annee"></div></div>
+  `;
+  fillWheelColumn(`wheel-${prefix}-jour`, Array.from({length:31},(_,i)=>({value:i+1,label:String(i+1)})));
+  fillWheelColumn(`wheel-${prefix}-mois`, MOIS_LABELS.map((m,i)=>({value:i+1,label:m})));
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for(let y=currentYear-5;y>=currentYear-100;y--){ years.push({value:y,label:String(y)}); }
+  fillWheelColumn(`wheel-${prefix}-annee`, years);
+}
+
+function buildTimeWheelPicker(containerId, prefix){
+  const container = document.getElementById(containerId);
+  container.innerHTML = `
+    <div class="wheel-highlight"></div>
+    <div class="wheel-col"><div class="wheel-scroll" id="wheel-${prefix}-heure"></div></div>
+    <div class="wheel-sep">:</div>
+    <div class="wheel-col"><div class="wheel-scroll" id="wheel-${prefix}-minute"></div></div>
+  `;
+  const heureItems = [{value:'',label:'—'}].concat(Array.from({length:24},(_,i)=>({value:String(i).padStart(2,'0'),label:String(i).padStart(2,'0')})));
+  fillWheelColumn(`wheel-${prefix}-heure`, heureItems);
+  const minuteItems = [{value:'',label:'—'}].concat(['00','15','30','45'].map(m=>({value:m,label:m})));
+  fillWheelColumn(`wheel-${prefix}-minute`, minuteItems);
+}
+
+function fillWheelColumn(id, items){
+  const el = document.getElementById(id);
+  el.innerHTML = items.map(it=>`<div class="wheel-item">${it.label}</div>`).join('');
+  el.dataset.items = JSON.stringify(items.map(it=>it.value));
+  el.addEventListener('scroll', ()=>onWheelScroll(el), {passive:true});
+  el.addEventListener('click', (ev)=>{
+    const item = ev.target.closest('.wheel-item');
+    if(!item) return;
+    const idx = Array.from(el.children).indexOf(item);
+    el.scrollTo({top: idx*WHEEL_ITEM_HEIGHT, behavior:'smooth'});
+  });
+}
+
+function onWheelScroll(el){
+  clearTimeout(el._scrollTimer);
+  el._scrollTimer = setTimeout(()=>{
+    const idx = Math.round(el.scrollTop / WHEEL_ITEM_HEIGHT);
+    const items = el.querySelectorAll('.wheel-item');
+    items.forEach((it,i)=> it.classList.toggle('selected', i===idx));
+  }, 60);
+}
+
+function setWheelValue(prefix, col, value){
+  const el = document.getElementById(`wheel-${prefix}-${col}`);
+  const values = JSON.parse(el.dataset.items);
+  let idx = values.indexOf(value);
+  if(idx<0) idx = 0;
+  el.scrollTop = idx*WHEEL_ITEM_HEIGHT;
+  const items = el.querySelectorAll('.wheel-item');
+  items.forEach((it,i)=> it.classList.toggle('selected', i===idx));
+}
+
+function getWheelValue(prefix, col){
+  const el = document.getElementById(`wheel-${prefix}-${col}`);
+  const values = JSON.parse(el.dataset.items);
+  const idx = Math.round(el.scrollTop / WHEEL_ITEM_HEIGHT);
+  return values[Math.max(0,Math.min(values.length-1, idx))];
+}
+
+function setDefaultWheelValues(prefix){
+  setWheelValue(prefix,'jour',1);
+  setWheelValue(prefix,'mois',1);
+  setWheelValue(prefix,'annee', new Date().getFullYear()-25);
+}
+
+/* ---------- ONBOARDING ---------- */
+async function handleOnboardingSubmit(e){
+  e.preventDefault();
+  const prenom = document.getElementById('input-prenom').value.trim();
+  const nom = document.getElementById('input-nom').value.trim();
+  const heure = getWheelValue('input','heure');
+  const minute = getWheelValue('input','minute');
+  const lieu = document.getElementById('input-lieu').value.trim();
+  const errorEl = document.getElementById('onboarding-error');
+  if(!prenom){
+    errorEl.textContent = "Merci d'indiquer ton prénom.";
+    errorEl.style.display = 'block';
+    return;
+  }
+  errorEl.style.display = 'none';
+  const d = getWheelValue('input','jour');
+  const m = getWheelValue('input','mois');
+  const y = getWheelValue('input','annee');
+  const naissance = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const fullName = `${prenom} ${nom}`.trim();
+  profile = {
+    prenom, nom, naissance,
+    heureNaissance: (heure && minute) ? `${heure}:${minute}` : null,
+    lieuNaissance: lieu || null,
+    signe: getSigne(m,d),
+    cheminVie: getCheminVie(naissance),
+    nombreExpression: getNombreExpression(fullName),
+    nombreAme: getNombreAme(fullName),
+    nombrePersonnalite: getNombrePersonnalite(fullName)
+  };
+  try{ await window.storage.set('profile', JSON.stringify(profile), false); }catch(err){ console.error(err); }
+  renderHome();
+  showScreen('home');
+}
+
+function renderHome(){
+  const hour = new Date().getHours();
+  document.getElementById('home-greeting').textContent = (hour<18 ? 'Bonjour, ' : 'Bonsoir, ') + profile.prenom;
+  document.getElementById('home-subtitle').textContent = `Tu es ${profile.signe}, chemin de vie ${profile.cheminVie}.`;
+  document.getElementById('tile-numero-value').textContent = profile.cheminVie;
+  generateCarteDuJour(false);
+  updateStreak();
+  renderIntentionRitual();
+  loadGratitudeToday();
+}
+
+async function updateStreak(){
+  const todayStr = new Date().toISOString().slice(0,10);
+  let streak = { count:0, lastDate:null };
+  try{
+    const s = await window.storage.get('streak', false);
+    if(s && s.value) streak = JSON.parse(s.value);
+  }catch(e){}
+  if(streak.lastDate !== todayStr){
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    streak.count = (streak.lastDate === yesterday) ? (streak.count||0)+1 : 1;
+    streak.lastDate = todayStr;
+    try{ await window.storage.set('streak', JSON.stringify(streak), false); }catch(e){}
+  }
+  const el = document.getElementById('home-streak');
+  if(el) el.textContent = streak.count>1 ? `${streak.count} jours de suite` : 'Premier jour de ta série';
+}
+
+function displayCarte(text){
+  currentCarteText = text;
+  document.getElementById('carte-content').innerHTML = `<blockquote>${escapeHTML(text)}</blockquote>`;
+  document.getElementById('btn-nouvelle-carte').style.display = 'inline-block';
+  document.getElementById('btn-partager-carte').style.display = 'inline-block';
+}
+
+async function generateCarteDuJour(force){
+  const todayStr = new Date().toISOString().slice(0,10);
+  if(!force){
+    try{
+      const cached = await window.storage.get('carteDuJour', false);
+      if(cached && cached.value){
+        const obj = JSON.parse(cached.value);
+        if(obj.date === todayStr){ displayCarte(obj.text); return; }
+      }
+    }catch(e){ /* pas encore de carte enregistrée */ }
+  }
+  document.getElementById('carte-content').innerHTML = loadingDotsHTML();
+  document.getElementById('btn-nouvelle-carte').style.display = 'none';
+  document.getElementById('btn-partager-carte').style.display = 'none';
+  const prompt = `Prénom : ${profile.prenom}. Signe astrologique : ${profile.signe}. Chemin de vie : ${profile.cheminVie}. Rédige la carte du jour de cette personne.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_CARTE);
+    displayCarte(text);
+    try{ await window.storage.set('carteDuJour', JSON.stringify({date:todayStr, text}), false); }catch(e){}
+  }catch(err){
+    document.getElementById('carte-content').innerHTML = '<p style="margin:0;font-size:14px;">Une petite interférence dans les signaux… réessaie dans un instant.</p>';
+    document.getElementById('btn-nouvelle-carte').style.display = 'inline-block';
+  }
+}
+
+async function handleFeatureSubmit(type){
+  const cfg = FEATURE_CONFIG[type];
+  const inputEl = document.getElementById('input-'+type);
+  const value = inputEl.value.trim();
+  if(!value) return;
+  const btn = document.getElementById('btn-'+type);
+  const resultZone = document.getElementById('result-'+type);
+  btn.disabled = true;
+  resultZone.innerHTML = loadingDotsHTML();
+  try{
+    const text = await askIA(cfg.buildPrompt(value), SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal(type, value, text);
+    resultZone.innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    resultZone.innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+function renderNumero(){
+  document.getElementById('numero-big').textContent = profile.cheminVie;
+  document.getElementById('numero-text').textContent = CHEMIN_VIE_TEXTS[profile.cheminVie] || '';
+  document.getElementById('numero-expression').textContent = profile.nombreExpression;
+  document.getElementById('numero-ame').textContent = profile.nombreAme;
+  document.getElementById('numero-personnalite').textContent = profile.nombrePersonnalite;
+  document.getElementById('result-numero').innerHTML = '';
+}
+
+async function handleNumeroPlus(){
+  const btn = document.getElementById('btn-numero-plus');
+  btn.disabled = true;
+  document.getElementById('result-numero').innerHTML = loadingDotsHTML();
+  const prompt = `${profile.prenom}, signe ${profile.signe}. Chemin de vie : ${profile.cheminVie}. Nombre d'expression : ${profile.nombreExpression}. Nombre de l'âme : ${profile.nombreAme}. Nombre de personnalité : ${profile.nombrePersonnalite}. Rédige une lecture numérologique complète et personnalisée qui relie ces quatre nombres entre eux.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal('numero', 'Lecture complète', text);
+    document.getElementById('result-numero').innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    document.getElementById('result-numero').innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+function renderLune(){
+  const now = new Date();
+  const frac = getMoonPhaseFraction(now);
+  const idx = getMoonPhaseIndex(frac);
+  document.getElementById('lune-phase-name').textContent = MOON_PHASE_NAMES[idx];
+  document.getElementById('moon-steps').innerHTML = MOON_PHASE_NAMES.map((_,i)=>`<div class="moon-dot${i===idx?' active':''}"></div>`).join('');
+  document.getElementById('lune-ritual').textContent = MOON_RITUALS[idx];
+  const todayStr = now.toISOString().slice(0,10);
+  const cardIndex = simpleHash(todayStr + profile.prenom) % ORACLE_CARDS.length;
+  const card = ORACLE_CARDS[cardIndex];
+  document.getElementById('oracle-name').textContent = card.name;
+  document.getElementById('oracle-sens').textContent = card.sens;
+  document.getElementById('result-lune').innerHTML = '';
+  luneContext = { phaseName: MOON_PHASE_NAMES[idx], card };
+}
+
+async function handleLunePlus(){
+  const btn = document.getElementById('btn-lune-plus');
+  btn.disabled = true;
+  document.getElementById('result-lune').innerHTML = loadingDotsHTML();
+  const ctx = luneContext;
+  const prompt = `${profile.prenom} (signe : ${profile.signe}) consulte l'application aujourd'hui. Phase lunaire du jour : ${ctx.phaseName}. Carte oracle tirée : "${ctx.card.name}" (${ctx.card.sens}). Rédige une lecture personnalisée qui relie la phase de la lune et le message de cette carte pour cette personne aujourd'hui.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal('lune', `${ctx.phaseName} — ${ctx.card.name}`, text);
+    document.getElementById('result-lune').innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    document.getElementById('result-lune').innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+function renderTheme(){
+  document.getElementById('theme-signe').textContent = profile.signe;
+  let infoParts = [];
+  if(profile.heureNaissance) infoParts.push(`né(e) à ${profile.heureNaissance}`);
+  if(profile.lieuNaissance) infoParts.push(profile.lieuNaissance);
+  document.getElementById('theme-info').textContent = infoParts.length ? infoParts.join(', ') : "Ajoute ton heure et ton lieu de naissance dans ton profil pour une lecture encore plus riche.";
+  document.getElementById('result-theme').innerHTML = '';
+}
+
+async function handleThemePlus(){
+  const btn = document.getElementById('btn-theme-plus');
+  btn.disabled = true;
+  document.getElementById('result-theme').innerHTML = loadingDotsHTML();
+  let details = `Prénom : ${profile.prenom}. Signe solaire : ${profile.signe}.`;
+  if(profile.heureNaissance) details += ` Heure de naissance indiquée : ${profile.heureNaissance}.`;
+  if(profile.lieuNaissance) details += ` Lieu de naissance indiqué : ${profile.lieuNaissance}.`;
+  details += " Rédige une lecture de thème astral inspirée pour cette personne à partir de ces informations. Précise dès la première phrase qu'il s'agit d'une interprétation générale et non d'un calcul astronomique précis de la carte du ciel.";
+  try{
+    const text = await askIA(details, SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal('theme', 'Thème astral', text);
+    document.getElementById('result-theme').innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    document.getElementById('result-theme').innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+async function handleCompatSubmit(){
+  const autrePrenom = document.getElementById('compat-prenom').value.trim();
+  const errorEl = document.getElementById('compat-error');
+  if(!autrePrenom){
+    errorEl.textContent = "Merci d'indiquer un prénom.";
+    errorEl.style.display = 'block';
+    return;
+  }
+  errorEl.style.display = 'none';
+  const d = getWheelValue('compat','jour');
+  const m = getWheelValue('compat','mois');
+  const autreSigne = getSigne(m,d);
+  const btn = document.getElementById('btn-compat');
+  const resultZone = document.getElementById('result-compat');
+  btn.disabled = true;
+  resultZone.innerHTML = loadingDotsHTML();
+  const prompt = `${profile.prenom} (signe : ${profile.signe}) souhaite connaître sa compatibilité avec ${autrePrenom} (signe : ${autreSigne}). Rédige une lecture de compatibilité entre ces deux signes, en évoquant à la fois les affinités naturelles et les points de vigilance possibles dans la relation.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal('compat', `${profile.prenom} & ${autrePrenom}`, text);
+    resultZone.innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    resultZone.innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+async function saveToJournal(type, input, result){
+  const entry = { id: makeId(), type, input, result, date:new Date().toISOString(), fav:false, feedback:null, realized:false };
+  journal.unshift(entry);
+  journal = journal.slice(0,20);
+  try{ await window.storage.set('journal', JSON.stringify(journal), false); }catch(e){ console.error(e); }
+  return entry;
+}
+
+function computeJournalStats(){
+  const now = new Date();
+  const monthEntries = journal.filter(e=>{
+    const d = new Date(e.date);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  const counts = {};
+  monthEntries.forEach(e=>{ counts[e.type] = (counts[e.type]||0)+1; });
+  let topType = null, topCount = 0;
+  Object.entries(counts).forEach(([t,c])=>{ if(c>topCount){ topType=t; topCount=c; } });
+  return { total: monthEntries.length, topType };
+}
+
+function renderJournalStats(){
+  const stats = computeJournalStats();
+  const el = document.getElementById('journal-stats-text');
+  if(stats.total === 0){
+    el.textContent = "Aucune lecture explorée ce mois-ci pour l'instant.";
+  } else {
+    const plural = stats.total>1 ? 's' : '';
+    let txt = `${stats.total} lecture${plural} explorée${plural} ce mois-ci.`;
+    if(stats.topType) txt += ` Ton type favori : ${JOURNAL_LABELS[stats.topType]}.`;
+    el.textContent = txt;
+  }
+}
+
+async function toggleFavorite(id){
+  const entry = journal.find(e=>e.id===id);
+  if(!entry) return;
+  entry.fav = !entry.fav;
+  try{ await window.storage.set('journal', JSON.stringify(journal), false); }catch(e){}
+  renderJournal();
+}
+
+function renderJournal(){
+  renderJournalStats();
+  const list = document.getElementById('journal-list');
+  const entries = journalFilter==='fav' ? journal.filter(e=>e.fav) : journal;
+  if(entries.length===0){
+    list.innerHTML = journalFilter==='fav'
+      ? '<p class="screen-intro">Aucun favori pour l\'instant. Marque une lecture d\'une étoile pour la retrouver ici.</p>'
+      : '<p class="screen-intro">Ton journal est encore vide. Explore une heure miroir, un rêve ou un signe pour que tes lectures apparaissent ici.</p>';
+    return;
+  }
+  list.innerHTML = entries.map(entry => `
+    <div class="journal-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="jtype">${JOURNAL_LABELS[entry.type] || entry.type}</div>
+        <button class="jfav-btn" data-id="${entry.id}" aria-label="Favori">
+          <svg viewBox="0 0 24 24" fill="${entry.fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.5L22 9.3l-5 4.9 1.2 7.1L12 17.9l-6.2 3.4L7 14.2 2 9.3l7.1-.8L12 2z"/></svg>
+        </button>
+      </div>
+      <div class="jinput">${escapeHTML(entry.input)}</div>
+      <div class="jresult">${escapeHTML(entry.result)}</div>
+      ${entry.type==='manifestation' ? (entry.realized
+          ? '<p style="color:var(--gold);font-size:12px;margin-top:8px;">✨ Réalisée</p>'
+          : `<button class="btn-text realize-btn" data-id="${entry.id}" style="margin-top:8px;font-size:12px;">Marquer comme réalisée</button>`)
+        : ''}
+      <div class="jdate">${formatDateShort(entry.date)}</div>
+    </div>
+  `).join('');
+}
+
+function getCurrentIntention(){
+  return journal.find(e=>e.type==='manifestation') || null;
+}
+
+function renderIntentionRitual(){
+  const el = document.getElementById('ritual-content-intention');
+  const intention = getCurrentIntention();
+  if(!intention){
+    el.innerHTML = `<p style="font-size:13.5px;margin:0 0 14px;">Tu n'as pas encore posé d'intention.</p><button type="button" class="btn-text" id="btn-poser-intention" style="margin-top:0;">Poser une intention</button>`;
+    document.getElementById('btn-poser-intention').addEventListener('click', ()=>showScreen('manifestation'));
+    return;
+  }
+  el.innerHTML = `
+    <blockquote style="margin:0 0 10px;font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.55;color:var(--ink);">${escapeHTML(intention.result)}</blockquote>
+    <p style="font-size:12px;margin:0 0 14px;">Intention posée : « ${escapeHTML(intention.input)} »</p>
+    ${intention.realized
+      ? '<p style="color:var(--gold);font-size:13px;margin:0 0 4px;">✨ Réalisée</p>'
+      : `<button type="button" class="btn-text realize-btn" data-id="${intention.id}" style="margin-top:0;">Marquer comme réalisée</button>`}
+    <button type="button" class="btn-text" id="btn-nouvelle-intention" style="margin-top:10px;display:block;">Nouvelle intention</button>
+  `;
+  document.getElementById('btn-nouvelle-intention').addEventListener('click', ()=>showScreen('manifestation'));
+}
+
+async function toggleRealized(id){
+  const entry = journal.find(e=>e.id===id);
+  if(!entry) return;
+  entry.realized = !entry.realized;
+  try{ await window.storage.set('journal', JSON.stringify(journal), false); }catch(e){}
+  renderJournal();
+  renderIntentionRitual();
+}
+
+async function loadGratitudeToday(){
+  const todayStr = new Date().toISOString().slice(0,10);
+  let entry = null;
+  try{
+    const g = await window.storage.get('gratitude', false);
+    if(g && g.value){
+      const log = JSON.parse(g.value);
+      entry = log.find(e=>e.date===todayStr) || null;
+    }
+  }catch(e){}
+  document.getElementById('gratitude-1').value = entry ? (entry.items[0]||'') : '';
+  document.getElementById('gratitude-2').value = entry ? (entry.items[1]||'') : '';
+  document.getElementById('gratitude-3').value = entry ? (entry.items[2]||'') : '';
+}
+
+async function handleGratitudeSave(){
+  const items = [1,2,3].map(n=>document.getElementById('gratitude-'+n).value.trim());
+  const todayStr = new Date().toISOString().slice(0,10);
+  let log = [];
+  try{
+    const g = await window.storage.get('gratitude', false);
+    if(g && g.value) log = JSON.parse(g.value);
+  }catch(e){ log = []; }
+  const idx = log.findIndex(e=>e.date===todayStr);
+  const entry = { date: todayStr, items };
+  if(idx>=0) log[idx] = entry; else log.unshift(entry);
+  log = log.slice(0,30);
+  try{ await window.storage.set('gratitude', JSON.stringify(log), false); }catch(e){}
+  const msg = document.getElementById('gratitude-saved-msg');
+  msg.style.display = 'block';
+  setTimeout(()=>{ msg.style.display = 'none'; }, 2500);
+}
+
+function affirmationsListHTML(list){
+  return list.map(text => `<div class="result-panel" style="margin-bottom:10px;"><p>${escapeHTML(text)}</p></div>`).join('');
+}
+
+async function renderAffirmations(force){
+  const todayStr = new Date().toISOString().slice(0,10);
+  if(!force){
+    try{
+      const cached = await window.storage.get('affirmationsDuJour', false);
+      if(cached && cached.value){
+        const obj = JSON.parse(cached.value);
+        if(obj.date === todayStr && obj.list && obj.list.length){
+          document.getElementById('affirmations-list').innerHTML = affirmationsListHTML(obj.list);
+          return;
+        }
+      }
+    }catch(e){ /* pas encore générées aujourd'hui */ }
+  }
+  document.getElementById('affirmations-list').innerHTML = loadingDotsHTML();
+  const prompt = `Rédige 10 affirmations positives courtes et variées, dans l'esprit de la loi de l'attraction, personnalisées pour ${profile.prenom} (signe : ${profile.signe}). Chaque affirmation est une phrase à la première personne ("je..."), au présent, sur des thèmes différents (confiance en soi, abondance, amour, sérénité, réussite...). Réponds uniquement par la liste, une affirmation par ligne, sans numérotation, sans tirets, sans introduction ni conclusion.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_AFFIRMATIONS);
+    const list = text.split('\n').map(l=>l.trim().replace(/^[-•\d.)\s]+/, '')).filter(l=>l.length>0);
+    document.getElementById('affirmations-list').innerHTML = affirmationsListHTML(list);
+    try{ await window.storage.set('affirmationsDuJour', JSON.stringify({date:todayStr, list}), false); }catch(e){}
+  }catch(e){
+    document.getElementById('affirmations-list').innerHTML = errorHTML();
+  }
+}
+
+function renderSephirotTree(){
+  const svg = document.getElementById('sephirot-tree');
+  const nodeByKey = {};
+  SEPHIROT.forEach(s=>{ nodeByKey[s.key]=s; });
+  const linesHTML = SEPHIROT_PATHS.map(([a,b])=>{
+    const pa = nodeByKey[a], pb = nodeByKey[b];
+    return `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke="rgba(203,163,92,0.35)" stroke-width="1.2"/>`;
+  }).join('');
+  const nodesHTML = SEPHIROT.map(s=>{
+    const isSelected = selectedSephira && selectedSephira.key===s.key;
+    const isLeft = s.x === 100;
+    const labelX = isLeft ? s.x-16 : s.x+16;
+    const anchor = isLeft ? 'end' : 'start';
+    return `<g class="sephira-node" data-key="${s.key}" style="cursor:pointer;">
+      <circle cx="${s.x}" cy="${s.y}" r="11" fill="${isSelected ? '#CBA35C' : '#1b1e3d'}" stroke="#CBA35C" stroke-width="1.3"/>
+      <text x="${labelX}" y="${s.y+4}" text-anchor="${anchor}" font-family="Karla, sans-serif" font-size="11" fill="${isSelected ? '#CBA35C' : '#9295B5'}" font-weight="${isSelected ? '700' : '400'}">${s.name}</text>
+    </g>`;
+  }).join('');
+  svg.innerHTML = linesHTML + nodesHTML;
+}
+
+function renderSephiraInfo(){
+  const el = document.getElementById('sephira-info');
+  if(!selectedSephira){ el.innerHTML=''; return; }
+  el.innerHTML = `
+    <h2>${escapeHTML(selectedSephira.name)} — ${escapeHTML(selectedSephira.trad)}</h2>
+    <p style="font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink);margin:0;line-height:1.55;">${escapeHTML(selectedSephira.theme)}</p>
+  `;
+  document.getElementById('result-arbrevie').innerHTML = '';
+}
+
+function prepareArbreVie(){
+  const todayStr = new Date().toISOString().slice(0,10);
+  const idx = simpleHash(todayStr + profile.prenom) % SEPHIROT.length;
+  selectedSephira = SEPHIROT[idx];
+  renderSephirotTree();
+  renderSephiraInfo();
+}
+
+async function handleSephiraLecture(){
+  if(!selectedSephira) return;
+  const btn = document.getElementById('btn-sephira-lecture');
+  btn.disabled = true;
+  document.getElementById('result-arbrevie').innerHTML = loadingDotsHTML();
+  const prompt = `${profile.prenom} (signe : ${profile.signe}) explore aujourd'hui la séphira ${selectedSephira.name} (${selectedSephira.trad}) de l'arbre de vie kabbalistique, associée à : ${selectedSephira.theme} En t'inspirant de cette énergie et de la loi de l'attraction, propose une lecture personnalisée pour cette personne aujourd'hui.`;
+  try{
+    const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+    const entry = await saveToJournal('sephira', selectedSephira.name, text);
+    document.getElementById('result-arbrevie').innerHTML = resultPanelHTML(text) + feedbackWidgetHTML(entry.id);
+  }catch(e){
+    document.getElementById('result-arbrevie').innerHTML = errorHTML();
+  }
+  btn.disabled = false;
+}
+
+/* ---------- PROFIL ---------- */
+function renderProfilView(){
+  document.getElementById('profil-prenom').textContent = profile.prenom;
+  document.getElementById('profil-nom').textContent = profile.nom || '—';
+  document.getElementById('profil-date').textContent = formatDateLongFR(profile.naissance);
+  document.getElementById('profil-heure').textContent = profile.heureNaissance || 'Non renseignée';
+  document.getElementById('profil-lieu').textContent = profile.lieuNaissance || 'Non renseigné';
+  document.getElementById('profil-signe').textContent = profile.signe;
+  document.getElementById('profil-chemin').textContent = profile.cheminVie;
+  document.getElementById('profil-view').style.display = 'block';
+  document.getElementById('profil-edit').style.display = 'none';
+  document.getElementById('profil-confirm-delete').style.display = 'none';
+}
+
+function openProfilEdit(){
+  document.getElementById('pedit-prenom').value = profile.prenom;
+  document.getElementById('pedit-nom').value = profile.nom || '';
+  document.getElementById('pedit-lieu').value = profile.lieuNaissance || '';
+  const [y,m,d] = profile.naissance.split('-').map(Number);
+  setWheelValue('pedit','jour', d);
+  setWheelValue('pedit','mois', m);
+  setWheelValue('pedit','annee', y);
+  if(profile.heureNaissance){
+    const [hh,mm] = profile.heureNaissance.split(':');
+    setWheelValue('pedit','heure', hh);
+    setWheelValue('pedit','minute', mm);
+  } else {
+    setWheelValue('pedit','heure', '');
+    setWheelValue('pedit','minute', '');
+  }
+  document.getElementById('profil-view').style.display = 'none';
+  document.getElementById('profil-edit').style.display = 'block';
+}
+
+async function handleProfilSave(){
+  const prenom = document.getElementById('pedit-prenom').value.trim();
+  if(!prenom) return;
+  const nom = document.getElementById('pedit-nom').value.trim();
+  const lieu = document.getElementById('pedit-lieu').value.trim();
+  const heure = getWheelValue('pedit','heure');
+  const minute = getWheelValue('pedit','minute');
+  const d = getWheelValue('pedit','jour');
+  const m = getWheelValue('pedit','mois');
+  const y = getWheelValue('pedit','annee');
+  const naissance = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  const fullName = `${prenom} ${nom}`.trim();
+  profile = {
+    prenom, nom, naissance,
+    heureNaissance: (heure && minute) ? `${heure}:${minute}` : null,
+    lieuNaissance: lieu || null,
+    signe: getSigne(m,d),
+    cheminVie: getCheminVie(naissance),
+    nombreExpression: getNombreExpression(fullName),
+    nombreAme: getNombreAme(fullName),
+    nombrePersonnalite: getNombrePersonnalite(fullName)
+  };
+  try{ await window.storage.set('profile', JSON.stringify(profile), false); }catch(e){ console.error(e); }
+  renderProfilView();
+  renderHome();
+}
+
+async function handleProfilDelete(){
+  try{ await window.storage.delete('profile', false); }catch(e){}
+  try{ await window.storage.delete('journal', false); }catch(e){}
+  try{ await window.storage.delete('carteDuJour', false); }catch(e){}
+  try{ await window.storage.delete('streak', false); }catch(e){}
+  try{ await window.storage.delete('gratitude', false); }catch(e){}
+  try{ await window.storage.delete('affirmationsDuJour', false); }catch(e){}
+  try{ await window.storage.delete('arbreDeVie', false); }catch(e){}
+  profile = null;
+  journal = [];
+  showScreen('bienvenue');
+}
+
+document.getElementById('btn-bienvenue-commencer').addEventListener('click', ()=>showScreen('onboarding'));
+document.getElementById('btn-commencer').addEventListener('click', handleOnboardingSubmit);
+document.getElementById('btn-heures').addEventListener('click', ()=>handleFeatureSubmit('heures'));
+document.getElementById('btn-reve').addEventListener('click', ()=>handleFeatureSubmit('reve'));
+document.getElementById('btn-signe').addEventListener('click', ()=>handleFeatureSubmit('signe'));
+document.getElementById('btn-manifestation').addEventListener('click', ()=>handleFeatureSubmit('manifestation'));
+document.getElementById('btn-sephira-lecture').addEventListener('click', handleSephiraLecture);
+document.getElementById('sephirot-tree').addEventListener('click', (ev)=>{
+  const node = ev.target.closest('.sephira-node');
+  if(!node) return;
+  selectedSephira = SEPHIROT.find(s=>s.key===node.dataset.key);
+  renderSephirotTree();
+  renderSephiraInfo();
+});
+document.getElementById('btn-open-affirmations').addEventListener('click', ()=>{ showScreen('affirmations'); renderAffirmations(false); });
+document.getElementById('btn-nouvelles-affirmations').addEventListener('click', ()=>renderAffirmations(true));
+document.getElementById('btn-gratitude-save').addEventListener('click', handleGratitudeSave);
+
+document.querySelectorAll('.ritual-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.ritual-tab').forEach(b=>b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.ritual-content').forEach(c=>c.classList.remove('active'));
+    document.getElementById('ritual-content-'+btn.dataset.ritual).classList.add('active');
+  });
+});
+document.getElementById('btn-numero-plus').addEventListener('click', handleNumeroPlus);
+document.getElementById('btn-nouvelle-carte').addEventListener('click', ()=>generateCarteDuJour(true));
+document.getElementById('btn-partager-carte').addEventListener('click', ()=>{
+  document.getElementById('partage-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long', day:'numeric', month:'long'});
+  document.getElementById('partage-text').textContent = currentCarteText;
+  showScreen('partage');
+});
+document.getElementById('btn-lune-plus').addEventListener('click', handleLunePlus);
+document.getElementById('btn-theme-plus').addEventListener('click', handleThemePlus);
+document.getElementById('btn-compat').addEventListener('click', handleCompatSubmit);
+document.getElementById('btn-profil-modifier').addEventListener('click', openProfilEdit);
+document.getElementById('btn-profil-annuler').addEventListener('click', renderProfilView);
+document.getElementById('btn-profil-enregistrer').addEventListener('click', handleProfilSave);
+document.getElementById('btn-profil-supprimer').addEventListener('click', ()=>{
+  document.getElementById('profil-confirm-delete').style.display = 'block';
+});
+document.getElementById('btn-cancel-delete').addEventListener('click', ()=>{
+  document.getElementById('profil-confirm-delete').style.display = 'none';
+});
+document.getElementById('btn-confirm-delete').addEventListener('click', handleProfilDelete);
+
+document.querySelectorAll('.journal-tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    journalFilter = btn.dataset.filter;
+    document.querySelectorAll('.journal-tab').forEach(b=>b.classList.toggle('active', b===btn));
+    renderJournal();
+  });
+});
+
+document.addEventListener('click', (ev)=>{
+  const favBtn = ev.target.closest('.jfav-btn');
+  if(favBtn){ toggleFavorite(favBtn.dataset.id); return; }
+  const realizeBtn = ev.target.closest('.realize-btn');
+  if(realizeBtn){ toggleRealized(realizeBtn.dataset.id); return; }
+  const fbBtn = ev.target.closest('.feedback-btn');
+  if(fbBtn){
+    const row = fbBtn.closest('.feedback-row');
+    const entryId = row.dataset.entryId;
+    const entry = journal.find(e=>e.id===entryId);
+    if(entry){
+      entry.feedback = fbBtn.dataset.value;
+      window.storage.set('journal', JSON.stringify(journal), false).catch(()=>{});
+    }
+    row.querySelectorAll('.feedback-btn').forEach(b=>b.classList.toggle('active', b===fbBtn));
+  }
+});
+
+document.querySelectorAll('.tile[data-screen]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const target = btn.dataset.screen;
+    if(target==='numero') renderNumero();
+    if(target==='lune') renderLune();
+    if(target==='theme') renderTheme();
+    if(target==='arbrevie') prepareArbreVie();
+    showScreen(target);
+    if(target==='compat') setDefaultWheelValues('compat');
+  });
+});
+document.querySelectorAll('[data-back]').forEach(btn=>{
+  btn.addEventListener('click', ()=>showScreen(btn.dataset.backTo || 'home'));
+});
+document.querySelectorAll('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const nav = btn.dataset.nav;
+    if(nav==='journal') renderJournal();
+    if(nav==='profil') renderProfilView();
+    showScreen(nav);
+  });
+});
+
+async function init(){
+  buildWheelPicker('wheel-container-input','input');
+  buildWheelPicker('wheel-container-compat','compat');
+  buildWheelPicker('wheel-container-pedit','pedit');
+  buildTimeWheelPicker('wheel-container-input-time','input');
+  buildTimeWheelPicker('wheel-container-pedit-time','pedit');
+  setDefaultWheelValues('input');
+
+  try{
+    const p = await window.storage.get('profile', false);
+    if(p && p.value) profile = JSON.parse(p.value);
+  }catch(e){ profile = null; }
+  try{
+    const j = await window.storage.get('journal', false);
+    if(j && j.value) journal = JSON.parse(j.value);
+  }catch(e){ journal = []; }
+
+  if(profile){
+    renderHome();
+    showScreen('home');
+  }
+}
+init();
+</script>
+</body>
+</html>

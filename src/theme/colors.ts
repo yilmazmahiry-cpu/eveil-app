@@ -1,0 +1,17 @@
+export const colors = {
+  bg: '#12142B',
+  bgOuter: '#0b0c1c',
+  gold: '#CBA35C',
+  goldSoft: 'rgba(203,163,92,0.10)',
+  goldSofter: 'rgba(203,163,92,0.05)',
+  goldBorder: 'rgba(203,163,92,0.22)',
+  goldBorderStrong: 'rgba(203,163,92,0.4)',
+  ink: '#F5F1E6',
+  inkMuted: '#9295B5',
+  border: 'rgba(203,163,92,0.22)',
+  hairline: 'rgba(255,255,255,0.06)',
+  fieldBg: 'rgba(255,255,255,0.03)',
+  alert: '#E0A48C',
+  alertBg: 'rgba(224,164,140,0.08)',
+  alertBorder: 'rgba(224,164,140,0.35)',
+} as const;
