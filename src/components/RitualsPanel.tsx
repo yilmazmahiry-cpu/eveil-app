@@ -49,18 +49,21 @@ function CarteTab({ profile }: { profile: Profile }) {
       {loading && !text ? <LoadingDots /> : null}
       {error && !text ? <ErrorPanel /> : null}
       {text ? <Text style={styles.carteText}>{text}</Text> : null}
-      {(text || error) && (
+      {/* Une seule carte par jour : "Nouvelle carte" ne réapparaît qu'en cas d'échec de génération (retry), jamais pour en tirer une autre. */}
+      {error && !text ? (
         <View style={styles.carteActions}>
-          <TextButton title="Nouvelle carte" onPress={regenerate} style={{ marginTop: 0 }} />
-          {text ? (
-            <TextButton
-              title="Partager"
-              onPress={() => router.push({ pathname: '/partage', params: { text } })}
-              style={{ marginTop: 0 }}
-            />
-          ) : null}
+          <TextButton title="Réessayer" onPress={regenerate} style={{ marginTop: 0 }} />
         </View>
-      )}
+      ) : null}
+      {text ? (
+        <View style={styles.carteActions}>
+          <TextButton
+            title="Partager"
+            onPress={() => router.push({ pathname: '/partage', params: { text } })}
+            style={{ marginTop: 0 }}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }
