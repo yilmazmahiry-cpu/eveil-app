@@ -14,6 +14,7 @@ import {
   ManifestationIcon,
   ReveIcon,
   SigneIcon,
+  TarotIcon,
   ThemeIcon,
 } from '@/components/icons';
 import { useProfile } from '@/context/ProfileContext';
@@ -72,6 +73,12 @@ export default function HomeScreen() {
           title="Lune & Oracle"
           subtitle="Phase du jour et carte tirée pour toi"
           onPress={() => router.push('/lune')}
+        />
+        <Tile
+          icon={<TarotIcon />}
+          title="Tarot"
+          subtitle="Tire une carte, laisse-la te parler"
+          onPress={() => router.push('/tarot')}
         />
       </TileGrid>
 

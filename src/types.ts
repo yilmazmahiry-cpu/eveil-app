@@ -20,7 +20,8 @@ export type JournalType =
   | 'theme'
   | 'compat'
   | 'manifestation'
-  | 'sephira';
+  | 'sephira'
+  | 'tarot';
 
 export type JournalEntry = {
   id: string;
@@ -47,4 +48,5 @@ export const JOURNAL_LABELS: Record<JournalType, string> = {
   compat: 'Compatibilité',
   manifestation: 'Manifestation',
   sephira: 'Arbre de vie',
+  tarot: 'Tarot',
 };

@@ -49,6 +49,19 @@ export function ReveIcon({ size = 21, color = '#CBA35C' }: IconProps) {
   );
 }
 
+export function TarotIcon({ size = 21, color = '#CBA35C' }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M4 6a2 2 0 0 1 2-2h5.5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z"
+        {...strokeProps(color)}
+      />
+      <Path d="M13.5 5.2l4 1.3a2 2 0 0 1 1.3 2.5l-4.3 13.3" {...strokeProps(color)} />
+      <Circle cx={9} cy={9.5} r={1.6} {...strokeProps(color)} />
+    </Svg>
+  );
+}
+
 export function LuneIcon({ size = 21, color = '#CBA35C' }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
