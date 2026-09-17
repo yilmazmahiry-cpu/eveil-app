@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card, FavoriteButton } from '@/components/Common';
 import { Logo } from '@/components/Logo';
@@ -18,39 +19,40 @@ export default function JournalScreen() {
   const entries = filter === 'fav' ? journal.filter((e) => e.fav) : journal;
 
   return (
-    <FlatList
-      style={styles.screen}
-      contentContainerStyle={styles.content}
-      data={entries}
-      keyExtractor={(e) => e.id}
-      ListHeaderComponent={
-        <>
-          <View style={styles.logoRow}>
-            <Logo />
-            <Text style={styles.logoWord}>Éveil</Text>
-          </View>
-          <Text style={styles.title}>Ton journal</Text>
-          <Card style={{ marginBottom: 20 }}>
-            <Text style={styles.cardTitle}>Ce mois-ci</Text>
-            <Text style={styles.cardText}>{stats.text}</Text>
-          </Card>
-          <View style={styles.tabRow}>
-            <FilterTab label="Tout" active={filter === 'all'} onPress={() => setFilter('all')} />
-            <FilterTab label="Favoris" active={filter === 'fav'} onPress={() => setFilter('fav')} />
-          </View>
-        </>
-      }
-      ListEmptyComponent={
-        <Text style={styles.empty}>
-          {filter === 'fav'
-            ? "Aucun favori pour l'instant. Marque une lecture d'une étoile pour la retrouver ici."
-            : 'Ton journal est encore vide. Explore une heure miroir, un rêve ou un signe pour que tes lectures apparaissent ici.'}
-        </Text>
-      }
-      renderItem={({ item }) => (
-        <JournalItem entry={item} onToggleFav={() => toggleFavorite(item.id)} onToggleRealized={() => toggleRealized(item.id)} />
-      )}
-    />
+    <SafeAreaView style={styles.screen} edges={['top']}>
+      <FlatList
+        contentContainerStyle={styles.content}
+        data={entries}
+        keyExtractor={(e) => e.id}
+        ListHeaderComponent={
+          <>
+            <View style={styles.logoRow}>
+              <Logo />
+              <Text style={styles.logoWord}>Éveil</Text>
+            </View>
+            <Text style={styles.title}>Ton journal</Text>
+            <Card style={{ marginBottom: 20 }}>
+              <Text style={styles.cardTitle}>Ce mois-ci</Text>
+              <Text style={styles.cardText}>{stats.text}</Text>
+            </Card>
+            <View style={styles.tabRow}>
+              <FilterTab label="Tout" active={filter === 'all'} onPress={() => setFilter('all')} />
+              <FilterTab label="Favoris" active={filter === 'fav'} onPress={() => setFilter('fav')} />
+            </View>
+          </>
+        }
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            {filter === 'fav'
+              ? "Aucun favori pour l'instant. Marque une lecture d'une étoile pour la retrouver ici."
+              : 'Ton journal est encore vide. Explore une heure miroir, un rêve ou un signe pour que tes lectures apparaissent ici.'}
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <JournalItem entry={item} onToggleFav={() => toggleFavorite(item.id)} onToggleRealized={() => toggleRealized(item.id)} />
+        )}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -122,7 +124,7 @@ function computeStats(journal: JournalEntry[]) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 24, paddingTop: 30, paddingBottom: 100 },
+  content: { padding: 24, paddingBottom: 100 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 20 },
   logoWord: { fontFamily: fonts.serif, fontSize: 14.5, color: colors.inkMuted },
   title: { fontFamily: fonts.serifSemiBold, fontSize: 23, color: colors.ink, marginBottom: 18 },

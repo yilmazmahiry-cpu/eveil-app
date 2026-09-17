@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
+import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { CHEMIN_VIE_TEXTS } from '@/lib/numerology';
@@ -34,7 +35,7 @@ export default function NumeroScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Numérologie" />
       <View style={styles.bigWrap}>
         <Text style={styles.big}>{profile.cheminVie}</Text>
@@ -65,7 +66,7 @@ export default function NumeroScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
@@ -79,7 +80,7 @@ function NumRow({ label, value }: { label: string; value: number }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
   bigWrap: { alignItems: 'center', marginBottom: 6 },
   big: { fontFamily: fonts.serifSemiBold, fontSize: 52, color: colors.gold, lineHeight: 58 },
   text: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 21, color: colors.inkMuted, textAlign: 'center', marginBottom: 16 },

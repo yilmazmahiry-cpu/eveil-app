@@ -1,7 +1,8 @@
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { TextButton } from '@/components/Buttons';
 import { ErrorPanel, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
+import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { useAffirmations } from '@/hooks/useAffirmations';
 import { Profile } from '@/types';
@@ -16,7 +17,7 @@ function AffirmationsBody({ profile }: { profile: Profile }) {
   const { list, loading, error, regenerate } = useAffirmations(profile);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Bibliothèque d'affirmations" />
       <ScreenIntro>Des affirmations pensées pour toi.</ScreenIntro>
 
@@ -29,10 +30,10 @@ function AffirmationsBody({ profile }: { profile: Profile }) {
       </View>
 
       <TextButton title="Nouvelles affirmations" onPress={() => regenerate()} style={{ marginTop: 16 }} />
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
 });

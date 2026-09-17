@@ -157,6 +157,11 @@ export async function loadGratitudeForDate(date: string): Promise<GratitudeEntry
   return log.find((e) => e.date === date) || null;
 }
 
+export async function loadGratitudeHistory(excludeDate: string): Promise<GratitudeEntry[]> {
+  const log = (await getItem<GratitudeEntry[]>('gratitude')) || [];
+  return log.filter((e) => e.date !== excludeDate);
+}
+
 export async function saveGratitudeForToday(items: [string, string, string]): Promise<void> {
   const today = todayISO();
   let log = (await getItem<GratitudeEntry[]>('gratitude')) || [];

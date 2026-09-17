@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { Card, ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
+import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { Sephira, SEPHIROT, SEPHIROT_PATHS } from '@/data/sephirot';
@@ -45,7 +46,7 @@ export default function ArbreVieScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Arbre de vie" />
       <ScreenIntro center>Explore les dix séphiroth et découvre celle qui résonne avec toi aujourd’hui.</ScreenIntro>
 
@@ -122,12 +123,12 @@ export default function ArbreVieScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
   svgWrap: { alignItems: 'center', marginBottom: 16 },
   sephiraTitle: { fontFamily: fonts.sansBold, fontSize: 14.5, color: colors.inkMuted, marginBottom: 8 },
   sephiraTheme: { fontFamily: fonts.serifItalic, fontStyle: 'italic', fontSize: 15, color: colors.ink, lineHeight: 22 },

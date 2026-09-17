@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Logo } from '@/components/Logo';
 import { RitualsPanel } from '@/components/RitualsPanel';
+import { Screen } from '@/components/Screen';
 import { Tile, TileGrid } from '@/components/Tile';
 import {
   ArbreVieIcon,
@@ -29,7 +30,7 @@ export default function HomeScreen() {
   const streakLabel = streak.count > 1 ? `${streak.count} jours de suite` : 'Premier jour de ta série';
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <Screen edges={['top']} contentContainerStyle={styles.content}>
       <View style={styles.logoRow}>
         <Logo />
         <Text style={styles.logoWord}>Éveil</Text>
@@ -103,13 +104,12 @@ export default function HomeScreen() {
           onPress={() => router.push('/compat')}
         />
       </TileGrid>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 24, paddingTop: 30, paddingBottom: 40 },
+  content: { padding: 24, paddingBottom: 40 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
   logoWord: { fontFamily: fonts.serif, fontSize: 14.5, color: colors.inkMuted, letterSpacing: 0.3 },
   greeting: { fontFamily: fonts.serifSemiBold, fontSize: 25, color: colors.ink, marginTop: 16, marginBottom: 3 },

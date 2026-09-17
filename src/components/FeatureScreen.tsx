@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Keyboard, StyleSheet, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
@@ -9,6 +9,7 @@ import { JournalType } from '@/types';
 import { PrimaryButton } from './Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from './Common';
 import { StyledTextArea, StyledTextInput } from './Fields';
+import { Screen } from './Screen';
 
 export function FeatureScreen({
   type,
@@ -37,6 +38,7 @@ export function FeatureScreen({
 
   const handleSubmit = async () => {
     if (!value.trim() || !profile) return;
+    Keyboard.dismiss();
     setLoading(true);
     setError(false);
     setResult(null);
@@ -51,13 +53,19 @@ export function FeatureScreen({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title={title} />
       <ScreenIntro>{intro}</ScreenIntro>
       {multiline ? (
         <StyledTextArea value={value} onChangeText={setValue} placeholder={placeholder} />
       ) : (
-        <StyledTextInput value={value} onChangeText={setValue} placeholder={placeholder} />
+        <StyledTextInput
+          value={value}
+          onChangeText={setValue}
+          placeholder={placeholder}
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit}
+        />
       )}
       <PrimaryButton
         title={submitLabel ?? 'Découvrir le sens'}
@@ -83,11 +91,11 @@ export function FeatureScreen({
         )}
       </View>
       {footer}
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
   resultZone: { marginTop: 20, gap: 4 },
 });

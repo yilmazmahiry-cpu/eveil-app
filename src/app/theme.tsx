@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
+import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { colors } from '@/theme/colors';
@@ -44,7 +45,7 @@ export default function ThemeScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Thème astral" />
       <Text style={styles.intro}>
         Basé sur ton signe solaire : <Text style={styles.signe}>{profile.signe}</Text>
@@ -69,12 +70,12 @@ export default function ThemeScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
   intro: { fontFamily: fonts.sans, fontSize: 14, color: colors.inkMuted, textAlign: 'center', marginBottom: 4 },
   signe: { fontFamily: fonts.serif, color: colors.gold },
   infoText: { fontFamily: fonts.sans, fontSize: 12.5, color: colors.inkMuted, textAlign: 'center', marginBottom: 8 },

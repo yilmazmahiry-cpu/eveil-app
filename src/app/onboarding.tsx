@@ -1,11 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { Keyboard, StyleSheet, Text } from 'react-native';
 
 import { PrimaryButton } from '@/components/Buttons';
 import { DateWheelPicker, DateValue, dateValueToISO, defaultDateValue, defaultTimeValue, TimeValue, TimeWheelPicker } from '@/components/DateWheels';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
+import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { getSigne } from '@/lib/astrology';
 import { getCheminVie, getNombreAme, getNombreExpression, getNombrePersonnalite } from '@/lib/numerology';
@@ -27,6 +28,7 @@ export default function OnboardingScreen() {
       setError("Merci d'indiquer ton prénom.");
       return;
     }
+    Keyboard.dismiss();
     setError('');
     const naissance = dateValueToISO(date);
     const fullName = `${prenom.trim()} ${nom.trim()}`.trim();
@@ -46,17 +48,29 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <Screen contentContainerStyle={styles.content}>
       <Logo />
       <Text style={styles.title}>Avant de commencer</Text>
       <Text style={styles.subtitle}>Quelques informations pour personnaliser tes lectures.</Text>
 
       <LabeledField label="Ton prénom">
-        <StyledTextInput value={prenom} onChangeText={setPrenom} placeholder="Camille" />
+        <StyledTextInput
+          value={prenom}
+          onChangeText={setPrenom}
+          placeholder="Camille"
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
 
       <LabeledField label="Ton nom de famille" optional>
-        <StyledTextInput value={nom} onChangeText={setNom} placeholder="Martin" />
+        <StyledTextInput
+          value={nom}
+          onChangeText={setNom}
+          placeholder="Martin"
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
 
       <LabeledField label="Ta date de naissance">
@@ -68,7 +82,13 @@ export default function OnboardingScreen() {
       </LabeledField>
 
       <LabeledField label="Lieu de naissance" optional>
-        <StyledTextInput value={lieu} onChangeText={setLieu} placeholder="Paris, France" />
+        <StyledTextInput
+          value={lieu}
+          onChangeText={setLieu}
+          placeholder="Paris, France"
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -78,13 +98,12 @@ export default function OnboardingScreen() {
       <Text style={styles.footnote}>
         Éveil est un espace d’inspiration et de réflexion personnelle, pas une source de vérité absolue.
       </Text>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 24, paddingTop: 60, paddingBottom: 48, gap: 14 },
+  content: { padding: 24, paddingBottom: 48, gap: 14 },
   title: { fontFamily: fonts.serifSemiBold, fontSize: 26, color: colors.ink, marginTop: 16, marginBottom: 2 },
   subtitle: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 21, color: colors.inkMuted, marginBottom: 6 },
   error: { color: colors.alert, fontFamily: fonts.sans, fontSize: 13 },

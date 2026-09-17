@@ -1,4 +1,5 @@
 import { Redirect, Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HomeNavIcon, JournalNavIcon, ProfilNavIcon } from '@/components/icons';
 import { useProfile } from '@/context/ProfileContext';
@@ -7,6 +8,7 @@ import { fonts } from '@/theme/typography';
 
 export default function TabsLayout() {
   const { loading, profile } = useProfile();
+  const insets = useSafeAreaInsets();
 
   if (loading) return null;
   if (!profile) return <Redirect href="/welcome" />;
@@ -21,9 +23,9 @@ export default function TabsLayout() {
           backgroundColor: colors.bg,
           borderTopWidth: 1,
           borderTopColor: 'rgba(203,163,92,0.12)',
-          height: 84,
+          height: 60 + insets.bottom,
           paddingTop: 10,
-          paddingBottom: 22,
+          paddingBottom: Math.max(insets.bottom, 10),
         },
         tabBarLabelStyle: { fontFamily: fonts.sans, fontSize: 11 },
       }}

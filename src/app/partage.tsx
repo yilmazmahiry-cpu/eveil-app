@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { ScreenHeader, ScreenIntro } from '@/components/Common';
 import { Logo } from '@/components/Logo';
+import { Screen } from '@/components/Screen';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
@@ -15,7 +16,7 @@ export default function PartageScreen() {
   });
 
   return (
-    <View style={styles.container}>
+    <Screen scroll={false} contentContainerStyle={styles.container}>
       <ScreenHeader title="Partager" />
       <View style={styles.shareCard}>
         <Logo size={32} />
@@ -24,12 +25,12 @@ export default function PartageScreen() {
         <Text style={styles.brand}>Éveil</Text>
       </View>
       <ScreenIntro center>Fais une capture d’écran de cette carte pour la partager où tu veux.</ScreenIntro>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg, padding: 24, paddingTop: 30 },
+  container: { flex: 1, padding: 24 },
   shareCard: {
     borderWidth: 1,
     borderColor: colors.border,

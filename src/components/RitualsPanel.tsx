@@ -1,12 +1,14 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { loadGratitudeForDate, saveGratitudeForToday, useProfile } from '@/context/ProfileContext';
+import { loadGratitudeForDate, loadGratitudeHistory, saveGratitudeForToday, useProfile } from '@/context/ProfileContext';
 import { useCarteDuJour } from '@/hooks/useCarteDuJour';
+import { formatDateShortFR } from '@/lib/format';
+import { todayISO } from '@/lib/hash';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
-import { Profile } from '@/types';
+import { GratitudeEntry, Profile } from '@/types';
 
 import { Card, ErrorPanel, LoadingDots } from './Common';
 import { TextButton } from './Buttons';
@@ -94,16 +96,19 @@ function IntentionTab() {
 function GratitudeTab() {
   const [items, setItems] = useState<[string, string, string]>(['', '', '']);
   const [saved, setSaved] = useState(false);
+  const [history, setHistory] = useState<GratitudeEntry[]>([]);
 
   useEffect(() => {
     (async () => {
-      const today = new Date().toISOString().slice(0, 10);
-      const entry = await loadGratitudeForDate(today);
+      const today = todayISO();
+      const [entry, past] = await Promise.all([loadGratitudeForDate(today), loadGratitudeHistory(today)]);
       if (entry) setItems(entry.items);
+      setHistory(past);
     })();
   }, []);
 
   const handleSave = async () => {
+    Keyboard.dismiss();
     await saveGratitudeForToday(items);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -119,6 +124,8 @@ function GratitudeTab() {
             value={items[i]}
             onChangeText={(v) => setItems((prev) => prev.map((it, idx) => (idx === i ? v : it)) as [string, string, string])}
             placeholder={`${i + 1}.`}
+            returnKeyType="done"
+            onSubmitEditing={() => Keyboard.dismiss()}
           />
         ))}
       </View>
@@ -126,6 +133,39 @@ function GratitudeTab() {
         <Text style={styles.saveBtnText}>Enregistrer</Text>
       </Pressable>
       {saved ? <Text style={styles.savedMsg}>Enregistré pour aujourd’hui ✨</Text> : null}
+
+      <GratitudeHistory history={history} />
+    </View>
+  );
+}
+
+function GratitudeHistory({ history }: { history: GratitudeEntry[] }) {
+  const entries = history
+    .map((entry) => ({ ...entry, items: entry.items.filter((it) => it.trim()) }))
+    .filter((entry) => entry.items.length > 0)
+    .slice(0, 7);
+
+  if (entries.length === 0) {
+    return (
+      <Text style={styles.historyEmpty}>
+        Ton historique de gratitude apparaîtra ici au fil des jours.
+      </Text>
+    );
+  }
+
+  return (
+    <View style={styles.historySection}>
+      <Text style={styles.historyTitle}>Tes gratitudes précédentes</Text>
+      {entries.map((entry) => (
+        <View key={entry.date} style={styles.historyItem}>
+          <Text style={styles.historyDate}>{formatDateShortFR(entry.date)}</Text>
+          {entry.items.map((it, i) => (
+            <Text key={i} style={styles.historyText}>
+              {it}
+            </Text>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
@@ -164,4 +204,24 @@ const styles = StyleSheet.create({
   },
   saveBtnText: { fontFamily: fonts.sansBold, fontSize: 15, color: '#1b1e3d' },
   savedMsg: { color: colors.gold, fontFamily: fonts.sans, fontSize: 12.5, marginTop: 10 },
+  historyEmpty: {
+    fontFamily: fonts.sans,
+    fontSize: 12.5,
+    color: colors.inkMuted,
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.hairline,
+  },
+  historySection: {
+    marginTop: 18,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.hairline,
+    gap: 14,
+  },
+  historyTitle: { fontFamily: fonts.sansBold, fontSize: 12.5, color: colors.inkMuted },
+  historyItem: { gap: 3 },
+  historyDate: { fontFamily: fonts.sansBold, fontSize: 11.5, color: colors.gold, marginBottom: 2 },
+  historyText: { fontFamily: fonts.serifItalic, fontStyle: 'italic', fontSize: 13.5, color: colors.ink, lineHeight: 19 },
 });

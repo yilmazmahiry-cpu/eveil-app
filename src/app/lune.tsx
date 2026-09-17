@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { Card, ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
+import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { ORACLE_CARDS } from '@/data/oracleCards';
@@ -49,7 +50,7 @@ export default function LuneScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Lune & Oracle" />
       <View style={styles.center}>
         <Text style={styles.phaseName}>{moon.phaseName}</Text>
@@ -85,12 +86,12 @@ export default function LuneScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  container: { padding: 24, paddingBottom: 40 },
   center: { alignItems: 'center' },
   phaseName: { fontFamily: fonts.serifSemiBold, fontSize: 19, color: colors.ink, marginBottom: 2 },
   dotsRow: { flexDirection: 'row', gap: 6, marginVertical: 14 },

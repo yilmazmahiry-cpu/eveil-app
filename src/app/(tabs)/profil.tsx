@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton, TextButton } from '@/components/Buttons';
 import {
@@ -13,6 +13,7 @@ import {
 } from '@/components/DateWheels';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
+import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { getSigne } from '@/lib/astrology';
 import { formatDateLongFR } from '@/lib/format';
@@ -42,7 +43,7 @@ export default function ProfilScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <Screen edges={['top']} contentContainerStyle={styles.content}>
       <View style={styles.logoRow}>
         <Logo />
         <Text style={styles.logoWord}>Éveil</Text>
@@ -86,7 +87,7 @@ export default function ProfilScreen() {
           </View>
         </View>
       )}
-    </ScrollView>
+    </Screen>
   );
 }
 
@@ -120,6 +121,7 @@ function ProfilEditForm({
 
   const handleSave = () => {
     if (!prenom.trim()) return;
+    Keyboard.dismiss();
     const naissance = dateValueToISO(date);
     const fullName = `${prenom.trim()} ${nom.trim()}`.trim();
     onSave({
@@ -137,7 +139,7 @@ function ProfilEditForm({
   };
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={[styles.content, { gap: 14 }]} keyboardShouldPersistTaps="handled">
+    <Screen edges={['top']} contentContainerStyle={[styles.content, { gap: 14 }]}>
       <View style={styles.logoRow}>
         <Logo />
         <Text style={styles.logoWord}>Éveil</Text>
@@ -145,10 +147,20 @@ function ProfilEditForm({
       <Text style={styles.title}>Modifier ton profil</Text>
 
       <LabeledField label="Ton prénom">
-        <StyledTextInput value={prenom} onChangeText={setPrenom} />
+        <StyledTextInput
+          value={prenom}
+          onChangeText={setPrenom}
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
       <LabeledField label="Ton nom de famille">
-        <StyledTextInput value={nom} onChangeText={setNom} />
+        <StyledTextInput
+          value={nom}
+          onChangeText={setNom}
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
       <LabeledField label="Ta date de naissance">
         <DateWheelPicker value={date} onChange={setDate} />
@@ -157,20 +169,24 @@ function ProfilEditForm({
         <TimeWheelPicker value={time} onChange={setTime} />
       </LabeledField>
       <LabeledField label="Lieu de naissance" optional>
-        <StyledTextInput value={lieu} onChangeText={setLieu} />
+        <StyledTextInput
+          value={lieu}
+          onChangeText={setLieu}
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
 
       <View style={styles.editActions}>
         <PrimaryButton title="Enregistrer" onPress={handleSave} style={{ flex: 1, marginTop: 0 }} />
         <TextButton title="Annuler" onPress={onCancel} style={{ marginTop: 0 }} />
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: 24, paddingTop: 30, paddingBottom: 60 },
+  content: { padding: 24, paddingBottom: 60 },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 20 },
   logoWord: { fontFamily: fonts.serif, fontSize: 14.5, color: colors.inkMuted },
   title: { fontFamily: fonts.serifSemiBold, fontSize: 23, color: colors.ink, marginBottom: 18 },

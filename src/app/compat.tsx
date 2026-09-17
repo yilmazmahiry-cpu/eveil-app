@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { DateValue, DateWheelPicker, defaultDateValue } from '@/components/DateWheels';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
+import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { getSigne } from '@/lib/astrology';
@@ -27,6 +28,7 @@ export default function CompatScreen() {
       setError("Merci d'indiquer un prénom.");
       return;
     }
+    Keyboard.dismiss();
     setError('');
     setLoading(true);
     setResultError(false);
@@ -44,12 +46,18 @@ export default function CompatScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Compatibilité" />
       <ScreenIntro>Renseigne les informations de l’autre personne.</ScreenIntro>
 
       <LabeledField label="Son prénom">
-        <StyledTextInput value={autrePrenom} onChangeText={setAutrePrenom} placeholder="Alex" />
+        <StyledTextInput
+          value={autrePrenom}
+          onChangeText={setAutrePrenom}
+          placeholder="Alex"
+          returnKeyType="done"
+          onSubmitEditing={() => Keyboard.dismiss()}
+        />
       </LabeledField>
 
       <LabeledField label="Sa date de naissance">
@@ -76,12 +84,12 @@ export default function CompatScreen() {
           </>
         )}
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 24, paddingTop: 30, paddingBottom: 60, gap: 14 },
+  container: { padding: 24, paddingBottom: 40, gap: 14 },
   error: { color: colors.alert, fontSize: 13 },
   resultZone: { marginTop: 6, gap: 4 },
 });
