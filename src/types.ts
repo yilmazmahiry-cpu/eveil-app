@@ -9,6 +9,11 @@ export type Profile = {
   nombreExpression: number;
   nombreAme: number;
   nombrePersonnalite: number;
+  // Thème natal précis (calculé côté serveur à partir de heureNaissance +
+  // lieuNaissance) ; null si non renseigné, non calculé, ou échec (lieu
+  // introuvable, backend indisponible).
+  ascendant: string | null;
+  signeLunaire: string | null;
 };
 
 export type JournalType =

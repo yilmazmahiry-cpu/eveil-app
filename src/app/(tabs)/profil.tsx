@@ -16,9 +16,8 @@ import { Logo } from '@/components/Logo';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
-import { getSigne } from '@/lib/astrology';
+import { buildProfile } from '@/lib/buildProfile';
 import { formatDateLongFR } from '@/lib/format';
-import { getCheminVie, getNombreAme, getNombreExpression, getNombrePersonnalite } from '@/lib/numerology';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
@@ -59,6 +58,8 @@ export default function ProfilScreen() {
       <Row label="Heure de naissance" value={profile.heureNaissance || 'Non renseignée'} />
       <Row label="Lieu de naissance" value={profile.lieuNaissance || 'Non renseigné'} />
       <Row label="Signe" value={profile.signe} />
+      {profile.signeLunaire ? <Row label="Signe lunaire" value={profile.signeLunaire} /> : null}
+      {profile.ascendant ? <Row label="Ascendant" value={profile.ascendant} /> : null}
       <Row label="Chemin de vie" value={String(profile.cheminVie)} />
 
       <PrimaryButton title="Modifier mes informations" onPress={() => setEditing(true)} style={{ marginTop: 22 }} />
@@ -121,24 +122,21 @@ function ProfilEditForm({
       ? { hour: initial.heureNaissance.split(':')[0], minute: initial.heureNaissance.split(':')[1] }
       : { hour: '', minute: '' }
   );
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!prenom.trim()) return;
     Keyboard.dismiss();
+    setSaving(true);
     const naissance = dateValueToISO(date);
-    const fullName = `${prenom.trim()} ${nom.trim()}`.trim();
-    onSave({
+    const profile = await buildProfile({
       prenom: prenom.trim(),
       nom: nom.trim(),
       naissance,
       heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
       lieuNaissance: lieu.trim() || null,
-      signe: getSigne(date.month, date.day),
-      cheminVie: getCheminVie(naissance),
-      nombreExpression: getNombreExpression(fullName),
-      nombreAme: getNombreAme(fullName),
-      nombrePersonnalite: getNombrePersonnalite(fullName),
     });
+    onSave(profile);
   };
 
   return (
@@ -181,7 +179,7 @@ function ProfilEditForm({
       </LabeledField>
 
       <View style={styles.editActions}>
-        <PrimaryButton title="Enregistrer" onPress={handleSave} style={{ flex: 1, marginTop: 0 }} />
+        <PrimaryButton title="Enregistrer" onPress={handleSave} loading={saving} style={{ flex: 1, marginTop: 0 }} />
         <TextButton title="Annuler" onPress={onCancel} style={{ marginTop: 0 }} />
       </View>
     </Screen>

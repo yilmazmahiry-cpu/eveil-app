@@ -46,7 +46,7 @@ exposée à l'app mobile (voir cahier des charges §5).
    `http://192.168.1.42:3000`), ou utilise un tunnel (`npx expo start --tunnel`) avec un
    service comme [ngrok](https://ngrok.com) pointé sur le port 3000.
 
-## Route
+## Routes
 
 ```
 POST /api/ai
@@ -55,6 +55,20 @@ Body:  { "systemPrompt": string, "userPrompt": string }
 400:   { "error": string }   — prompt manquant ou trop long
 502:   { "error": string }   — l'API Anthropic a échoué
 ```
+
+```
+POST /api/natal-chart
+Body:  { "date": "YYYY-MM-DD", "time": "HH:MM" (heure locale au lieu de naissance), "place": string }
+200:   { "sunSign": string, "moonSign": string, "ascendantSign": string, "latitude": number, "longitude": number }
+400:   { "error": string }   — champs manquants ou mal formés
+404:   { "error": string }   — lieu introuvable (géocodage)
+502:   { "error": string }   — calcul échoué
+```
+
+Calcule le vrai ascendant (via [circular-natal-horoscope-js](https://www.npmjs.com/package/circular-natal-horoscope-js),
+qui dérive automatiquement le fuseau horaire historique à partir des coordonnées) et
+géocode le lieu via [Nominatim](https://nominatim.openstreetmap.org/) (gratuit mais
+limité à 1 req/s — à remplacer par un fournisseur payant si le volume grandit).
 
 ## Déploiement
 

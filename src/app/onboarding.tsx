@@ -8,8 +8,7 @@ import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
-import { getSigne } from '@/lib/astrology';
-import { getCheminVie, getNombreAme, getNombreExpression, getNombrePersonnalite } from '@/lib/numerology';
+import { buildProfile } from '@/lib/buildProfile';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
@@ -22,6 +21,7 @@ export default function OnboardingScreen() {
   const [date, setDate] = useState<DateValue>(defaultDateValue());
   const [time, setTime] = useState<TimeValue>(defaultTimeValue());
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!prenom.trim()) {
@@ -30,20 +30,16 @@ export default function OnboardingScreen() {
     }
     Keyboard.dismiss();
     setError('');
+    setSubmitting(true);
     const naissance = dateValueToISO(date);
-    const fullName = `${prenom.trim()} ${nom.trim()}`.trim();
-    await saveProfile({
+    const profile = await buildProfile({
       prenom: prenom.trim(),
       nom: nom.trim(),
       naissance,
       heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
       lieuNaissance: lieu.trim() || null,
-      signe: getSigne(date.month, date.day),
-      cheminVie: getCheminVie(naissance),
-      nombreExpression: getNombreExpression(fullName),
-      nombreAme: getNombreAme(fullName),
-      nombrePersonnalite: getNombrePersonnalite(fullName),
     });
+    await saveProfile(profile);
     router.replace('/(tabs)');
   };
 
@@ -93,7 +89,7 @@ export default function OnboardingScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <PrimaryButton title="Commencer" onPress={handleSubmit} />
+      <PrimaryButton title="Commencer" onPress={handleSubmit} loading={submitting} />
 
       <Text style={styles.footnote}>
         Éveil est un espace d’inspiration et de réflexion personnelle, pas une source de vérité absolue.

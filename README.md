@@ -62,8 +62,14 @@ src/
 ## Ce qui reste à faire
 
 - [x] Backend `/api/ai` (voir [`server/`](server/README.md)) — reste à déployer en ligne
-- [ ] Éphémérides astronomiques réelles pour le thème astral (Swiss Ephemeris ou
-      équivalent), si une précision au-delà du signe solaire est souhaitée
-- [ ] Icônes et splash screen personnalisés aux couleurs de la marque
+- [x] Thème natal précis (soleil/lune/ascendant) via `/api/natal-chart`
+- [x] Icônes et splash screen personnalisés aux couleurs de la marque
+- [x] Tarot (78 cartes)
+- [ ] Comptes utilisateurs + base de données serveur (nécessaire pour les
+      abonnements payants, la notification avec contenu du jour, et la
+      compatibilité sociale persistante — actuellement tout est local à
+      l'appareil, sans compte)
 - [ ] Politique de confidentialité / CGU (données de naissance = données personnelles)
 - [ ] Comptes développeur Apple / Google Play avant publication
+- [ ] Géocodage Nominatim à remplacer par un fournisseur payant si le volume
+      d'utilisateurs grandit (politique d'usage stricte, 1 req/s)

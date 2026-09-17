@@ -5,6 +5,8 @@ import cors from 'cors';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 
+import { computeNatalChart } from './astrology.js';
+
 const PORT = process.env.PORT || 3000;
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 const MAX_PROMPT_LENGTH = 4000;
@@ -64,6 +66,36 @@ app.post('/api/ai', async (req, res) => {
   } catch (err) {
     console.error('Erreur Anthropic:', err);
     res.status(502).json({ error: 'Le service IA est momentanément indisponible.' });
+  }
+});
+
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TIME_RE = /^\d{2}:\d{2}$/;
+
+app.post('/api/natal-chart', async (req, res) => {
+  const { date, time, place } = req.body ?? {};
+
+  if (
+    typeof date !== 'string' ||
+    typeof time !== 'string' ||
+    typeof place !== 'string' ||
+    !DATE_RE.test(date) ||
+    !TIME_RE.test(time) ||
+    !place.trim() ||
+    place.length > 200
+  ) {
+    return res.status(400).json({ error: 'date (YYYY-MM-DD), time (HH:MM) et place sont requis.' });
+  }
+
+  try {
+    const chart = await computeNatalChart({ date, time, place: place.trim() });
+    if (!chart) {
+      return res.status(404).json({ error: "Lieu de naissance introuvable." });
+    }
+    res.json(chart);
+  } catch (err) {
+    console.error('Erreur calcul thème natal:', err);
+    res.status(502).json({ error: 'Le calcul du thème natal a échoué.' });
   }
 });
 
