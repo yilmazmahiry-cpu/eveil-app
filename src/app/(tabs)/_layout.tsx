@@ -7,11 +7,12 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function TabsLayout() {
-  const { loading, profile } = useProfile();
+  const { loading, session, profile } = useProfile();
   const insets = useSafeAreaInsets();
 
   if (loading) return null;
-  if (!profile) return <Redirect href="/welcome" />;
+  if (!session) return <Redirect href="/welcome" />;
+  if (!profile) return <Redirect href="/onboarding" />;
 
   return (
     <Tabs

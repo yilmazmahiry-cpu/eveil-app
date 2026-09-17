@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Keyboard, StyleSheet, Text } from 'react-native';
 
@@ -14,7 +14,7 @@ import { fonts } from '@/theme/typography';
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const { saveProfile } = useProfile();
+  const { loading, session, saveProfile } = useProfile();
   const [prenom, setPrenom] = useState('');
   const [nom, setNom] = useState('');
   const [lieu, setLieu] = useState('');
@@ -22,6 +22,9 @@ export default function OnboardingScreen() {
   const [time, setTime] = useState<TimeValue>(defaultTimeValue());
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  if (loading) return null;
+  if (!session) return <Redirect href="/welcome" />;
 
   const handleSubmit = async () => {
     if (!prenom.trim()) {

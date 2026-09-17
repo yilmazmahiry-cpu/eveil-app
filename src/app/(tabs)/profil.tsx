@@ -22,7 +22,7 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function ProfilScreen() {
-  const { profile, saveProfile, deleteProfile } = useProfile();
+  const { profile, saveProfile, deleteProfile, signOut } = useProfile();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -63,19 +63,21 @@ export default function ProfilScreen() {
       <Row label="Chemin de vie" value={String(profile.cheminVie)} />
 
       <PrimaryButton title="Modifier mes informations" onPress={() => setEditing(true)} style={{ marginTop: 22 }} />
+      <TextButton title="Se déconnecter" onPress={() => signOut()} style={{ marginTop: 14 }} />
       <TextButton
         title="Supprimer mon profil"
         color={colors.alert}
         onPress={() => setConfirmingDelete(true)}
-        style={{ marginTop: 14 }}
+        style={{ marginTop: 10 }}
       />
 
       {confirmingDelete && (
         <View style={styles.confirmBox}>
           <View style={styles.confirmPanel}>
             <Text style={styles.confirmText}>
-              Cette action supprimera définitivement ton profil et ton journal, sans possibilité de retour en
-              arrière.
+              Cette action supprimera définitivement ton profil, ton journal et tes gratitudes, sans possibilité de
+              retour en arrière. Ton compte (email/mot de passe) reste actif : tu pourras te reconnecter et refaire
+              ton profil.
             </Text>
           </View>
           <View style={styles.confirmActions}>
@@ -129,13 +131,16 @@ function ProfilEditForm({
     Keyboard.dismiss();
     setSaving(true);
     const naissance = dateValueToISO(date);
-    const profile = await buildProfile({
-      prenom: prenom.trim(),
-      nom: nom.trim(),
-      naissance,
-      heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
-      lieuNaissance: lieu.trim() || null,
-    });
+    const profile = await buildProfile(
+      {
+        prenom: prenom.trim(),
+        nom: nom.trim(),
+        naissance,
+        heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
+        lieuNaissance: lieu.trim() || null,
+      },
+      initial
+    );
     onSave(profile);
   };
 

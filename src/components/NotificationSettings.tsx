@@ -1,14 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
+import { useProfile } from '@/context/ProfileContext';
 import { cancelDailyReminder, requestNotificationPermission, scheduleDailyReminder } from '@/lib/notifications';
-import { getItem, setItem } from '@/lib/storage';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 import { Card } from './Common';
-
-type NotifPrefs = { enabled: boolean; hour: number };
 
 const PRESETS = [
   { label: 'Matin · 9h', hour: 9 },
@@ -16,25 +14,11 @@ const PRESETS = [
   { label: 'Soir · 19h', hour: 19 },
 ];
 
-const DEFAULT_PREFS: NotifPrefs = { enabled: false, hour: 9 };
-
 export function NotificationSettings() {
-  const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS);
+  const { profile, saveProfile } = useProfile();
   const [denied, setDenied] = useState(false);
-  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const stored = await getItem<NotifPrefs>('notificationPrefs');
-      if (stored) setPrefs(stored);
-      setLoaded(true);
-    })();
-  }, []);
-
-  const persist = async (next: NotifPrefs) => {
-    setPrefs(next);
-    await setItem('notificationPrefs', next);
-  };
+  if (!profile) return null;
 
   const handleToggle = async (enabled: boolean) => {
     if (enabled) {
@@ -44,20 +28,17 @@ export function NotificationSettings() {
         return;
       }
       setDenied(false);
-      await scheduleDailyReminder(prefs.hour, 0);
-      await persist({ ...prefs, enabled: true });
+      await scheduleDailyReminder(profile.notifHour, 0);
     } else {
       await cancelDailyReminder();
-      await persist({ ...prefs, enabled: false });
     }
+    await saveProfile({ ...profile, notifEnabled: enabled });
   };
 
   const handlePickHour = async (hour: number) => {
-    await persist({ ...prefs, hour });
-    if (prefs.enabled) await scheduleDailyReminder(hour, 0);
+    await saveProfile({ ...profile, notifHour: hour });
+    if (profile.notifEnabled) await scheduleDailyReminder(hour, 0);
   };
-
-  if (!loaded) return null;
 
   return (
     <Card style={styles.card}>
@@ -67,10 +48,10 @@ export function NotificationSettings() {
           <Text style={styles.subtitle}>Une notification pour ne pas manquer ta carte du jour.</Text>
         </View>
         <Switch
-          value={prefs.enabled}
+          value={profile.notifEnabled}
           onValueChange={handleToggle}
           trackColor={{ false: 'rgba(255,255,255,0.15)', true: colors.goldBorderStrong }}
-          thumbColor={prefs.enabled ? colors.gold : '#9295B5'}
+          thumbColor={profile.notifEnabled ? colors.gold : '#9295B5'}
         />
       </View>
 
@@ -80,15 +61,15 @@ export function NotificationSettings() {
         </Text>
       ) : null}
 
-      {prefs.enabled ? (
+      {profile.notifEnabled ? (
         <View style={styles.presetRow}>
           {PRESETS.map((p) => (
             <Pressable
               key={p.hour}
               onPress={() => handlePickHour(p.hour)}
-              style={[styles.preset, prefs.hour === p.hour && styles.presetActive]}
+              style={[styles.preset, profile.notifHour === p.hour && styles.presetActive]}
             >
-              <Text style={[styles.presetLabel, prefs.hour === p.hour && styles.presetLabelActive]}>{p.label}</Text>
+              <Text style={[styles.presetLabel, profile.notifHour === p.hour && styles.presetLabelActive]}>{p.label}</Text>
             </Pressable>
           ))}
         </View>

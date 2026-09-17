@@ -2,11 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { askIA } from '@/api/ai';
 import { SYSTEM_PROMPT_AFFIRMATIONS } from '@/data/prompts';
-import { todayISO } from '@/lib/hash';
-import { getItem, setItem } from '@/lib/storage';
+import { getDailyCache, setDailyCache } from '@/lib/dailyCache';
 import { Profile } from '@/types';
-
-type AffirmationsCache = { date: string; list: string[] };
 
 export function useAffirmations(profile: Profile) {
   const [list, setList] = useState<string[]>([]);
@@ -15,11 +12,10 @@ export function useAffirmations(profile: Profile) {
 
   const generate = useCallback(
     async (force: boolean) => {
-      const today = todayISO();
       if (!force) {
-        const cached = await getItem<AffirmationsCache>('affirmationsDuJour');
-        if (cached && cached.date === today && cached.list?.length) {
-          setList(cached.list);
+        const cached = await getDailyCache<string[]>('affirmations');
+        if (cached?.length) {
+          setList(cached);
           setLoading(false);
           return;
         }
@@ -34,7 +30,7 @@ export function useAffirmations(profile: Profile) {
           .map((l) => l.trim().replace(/^[-•\d.)\s]+/, ''))
           .filter((l) => l.length > 0);
         setList(nextList);
-        await setItem('affirmationsDuJour', { date: today, list: nextList });
+        await setDailyCache('affirmations', nextList);
       } catch {
         setError(true);
       }

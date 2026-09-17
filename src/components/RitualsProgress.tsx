@@ -3,8 +3,8 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { loadGratitudeForDate } from '@/context/ProfileContext';
+import { getDailyCache } from '@/lib/dailyCache';
 import { todayISO } from '@/lib/hash';
-import { getItem } from '@/lib/storage';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 import { JournalEntry } from '@/types';
@@ -16,12 +16,11 @@ export function RitualsProgress({ journal }: { journal: JournalEntry[] }) {
   useFocusEffect(
     useCallback(() => {
       (async () => {
-        const today = todayISO();
         const [carte, gratitude] = await Promise.all([
-          getItem<{ date: string }>('carteDuJour'),
-          loadGratitudeForDate(today),
+          getDailyCache<string>('carte'),
+          loadGratitudeForDate(todayISO()),
         ]);
-        setCarteDone(carte?.date === today);
+        setCarteDone(!!carte);
         setGratitudeDone(!!gratitude && gratitude.items.some((it) => it.trim().length > 0));
       })();
     }, [])

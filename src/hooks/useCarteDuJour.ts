@@ -2,11 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { askIA } from '@/api/ai';
 import { SYSTEM_PROMPT_CARTE } from '@/data/prompts';
-import { getItem, setItem } from '@/lib/storage';
-import { todayISO } from '@/lib/hash';
+import { getDailyCache, setDailyCache } from '@/lib/dailyCache';
 import { Profile } from '@/types';
-
-type CarteCache = { date: string; text: string };
 
 export function useCarteDuJour(profile: Profile) {
   const [text, setText] = useState<string | null>(null);
@@ -15,11 +12,10 @@ export function useCarteDuJour(profile: Profile) {
 
   const generate = useCallback(
     async (force: boolean) => {
-      const today = todayISO();
       if (!force) {
-        const cached = await getItem<CarteCache>('carteDuJour');
-        if (cached && cached.date === today) {
-          setText(cached.text);
+        const cached = await getDailyCache<string>('carte');
+        if (cached) {
+          setText(cached);
           setLoading(false);
           return;
         }
@@ -30,7 +26,7 @@ export function useCarteDuJour(profile: Profile) {
       try {
         const result = await askIA(prompt, SYSTEM_PROMPT_CARTE);
         setText(result);
-        await setItem('carteDuJour', { date: today, text: result });
+        await setDailyCache('carte', result);
       } catch {
         setError(true);
       }

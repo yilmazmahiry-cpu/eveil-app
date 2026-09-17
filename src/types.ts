@@ -14,6 +14,9 @@ export type Profile = {
   // introuvable, backend indisponible).
   ascendant: string | null;
   signeLunaire: string | null;
+  notifEnabled: boolean;
+  notifHour: number;
+  inviteCode: string;
 };
 
 export type JournalType =

@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { PrimaryButton } from '@/components/Buttons';
+import { PrimaryButton, TextButton } from '@/components/Buttons';
 import { Logo } from '@/components/Logo';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -18,7 +18,8 @@ export default function WelcomeScreen() {
           Ton espace quotidien pour explorer les signes, les cycles et les messages qui t’entourent.
         </Text>
       </View>
-      <PrimaryButton title="Découvrir Éveil" onPress={() => router.push('/onboarding')} />
+      <PrimaryButton title="Créer un compte" onPress={() => router.push('/signup')} />
+      <TextButton title="J'ai déjà un compte" onPress={() => router.push('/login')} style={styles.loginLink} />
     </SafeAreaView>
   );
 }
@@ -35,4 +36,5 @@ const styles = StyleSheet.create({
     maxWidth: 250,
     textAlign: 'center',
   },
+  loginLink: { alignSelf: 'center', marginTop: 14 },
 });

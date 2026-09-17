@@ -6,10 +6,6 @@ export function simpleHash(str: string): number {
   return h;
 }
 
-export function makeId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
-
 export function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
