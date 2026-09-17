@@ -13,6 +13,7 @@ import {
 } from '@/components/DateWheels';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
+import { NotificationSettings } from '@/components/NotificationSettings';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { getSigne } from '@/lib/astrology';
@@ -49,6 +50,8 @@ export default function ProfilScreen() {
         <Text style={styles.logoWord}>Éveil</Text>
       </View>
       <Text style={styles.title}>Ton profil</Text>
+
+      <NotificationSettings />
 
       <Row label="Prénom" value={profile.prenom} />
       <Row label="Nom" value={profile.nom || '—'} />

@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Logo } from '@/components/Logo';
 import { RitualsPanel } from '@/components/RitualsPanel';
+import { RitualsProgress } from '@/components/RitualsProgress';
 import { Screen } from '@/components/Screen';
 import { Tile, TileGrid } from '@/components/Tile';
 import {
@@ -20,7 +21,7 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function HomeScreen() {
-  const { profile, streak } = useProfile();
+  const { profile, streak, journal } = useProfile();
   const router = useRouter();
 
   if (!profile) return null;
@@ -41,6 +42,8 @@ export default function HomeScreen() {
         Tu es {profile.signe}, chemin de vie {profile.cheminVie}.
       </Text>
       <Text style={styles.streak}>{streakLabel}</Text>
+
+      <RitualsProgress journal={journal} />
 
       <RitualsPanel profile={profile} />
 
