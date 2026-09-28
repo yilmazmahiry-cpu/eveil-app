@@ -32,6 +32,22 @@ export function PrimaryButton({
   );
 }
 
+export function SecondaryButton({
+  title,
+  onPress,
+  style,
+}: {
+  title: string;
+  onPress: () => void;
+  style?: object;
+}) {
+  return (
+    <Pressable onPress={onPress} style={[styles.secondary, style]}>
+      <Text style={styles.secondaryText}>{title}</Text>
+    </Pressable>
+  );
+}
+
 export function TextButton({
   title,
   onPress,
@@ -66,6 +82,21 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sansBold,
     fontSize: 15,
     color: '#1b1e3d',
+  },
+  secondary: {
+    width: '100%',
+    borderWidth: 1.5,
+    borderColor: colors.goldBorderStrong,
+    borderRadius: 14,
+    paddingVertical: 14.5,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  secondaryText: {
+    fontFamily: fonts.sansBold,
+    fontSize: 14.5,
+    color: colors.gold,
   },
   textBtn: { paddingVertical: 4, marginTop: 10, alignSelf: 'flex-start' },
   textBtnLabel: {

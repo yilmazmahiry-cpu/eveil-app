@@ -109,14 +109,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
 
   const deleteProfile = useCallback(async () => {
     if (!session) return;
-    const uid = session.user.id;
-    await Promise.all([
-      supabase.from('journal_entries').delete().eq('user_id', uid),
-      supabase.from('gratitude_entries').delete().eq('user_id', uid),
-      supabase.from('daily_cache').delete().eq('user_id', uid),
-      supabase.from('streaks').delete().eq('user_id', uid),
-    ]);
-    await supabase.from('profiles').delete().eq('id', uid);
+    const { error } = await supabase.functions.invoke('delete-account');
+    if (error) throw error;
     setProfile(null);
     setJournal([]);
     setStreak({ count: 0, lastDate: null });

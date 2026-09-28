@@ -12,7 +12,7 @@ import {
   TimeWheelPicker,
 } from '@/components/DateWheels';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
-import { Logo } from '@/components/Logo';
+import { LogoGlow } from '@/components/LogoGlow';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
@@ -26,6 +26,8 @@ export default function ProfilScreen() {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
 
   if (!profile) return null;
 
@@ -45,7 +47,7 @@ export default function ProfilScreen() {
   return (
     <Screen edges={['top']} contentContainerStyle={styles.content}>
       <View style={styles.logoRow}>
-        <Logo />
+        <LogoGlow />
         <Text style={styles.logoWord}>Éveil</Text>
       </View>
       <Text style={styles.title}>Ton profil</Text>
@@ -65,7 +67,7 @@ export default function ProfilScreen() {
       <PrimaryButton title="Modifier mes informations" onPress={() => setEditing(true)} style={{ marginTop: 22 }} />
       <TextButton title="Se déconnecter" onPress={() => signOut()} style={{ marginTop: 14 }} />
       <TextButton
-        title="Supprimer mon profil"
+        title="Supprimer mon compte"
         color={colors.alert}
         onPress={() => setConfirmingDelete(true)}
         style={{ marginTop: 10 }}
@@ -75,17 +77,25 @@ export default function ProfilScreen() {
         <View style={styles.confirmBox}>
           <View style={styles.confirmPanel}>
             <Text style={styles.confirmText}>
-              Cette action supprimera définitivement ton profil, ton journal et tes gratitudes, sans possibilité de
-              retour en arrière. Ton compte (email/mot de passe) reste actif : tu pourras te reconnecter et refaire
-              ton profil.
+              Cette action supprime définitivement ton compte, ton profil, ton journal et tes gratitudes, sans
+              possibilité de retour en arrière. Tu devras créer un nouveau compte pour réutiliser Éveil.
             </Text>
+            {deleteError ? <Text style={[styles.confirmText, { color: colors.alert, marginTop: 8 }]}>Une erreur est survenue, réessaie.</Text> : null}
           </View>
           <View style={styles.confirmActions}>
             <PrimaryButton
               title="Oui, supprimer"
+              loading={deleting}
               onPress={async () => {
-                await deleteProfile();
-                router.replace('/welcome');
+                setDeleting(true);
+                setDeleteError(false);
+                try {
+                  await deleteProfile();
+                  router.replace('/welcome');
+                } catch {
+                  setDeleteError(true);
+                  setDeleting(false);
+                }
               }}
               style={{ backgroundColor: colors.alert, flex: 1, marginTop: 0 }}
             />
@@ -147,7 +157,7 @@ function ProfilEditForm({
   return (
     <Screen edges={['top']} contentContainerStyle={[styles.content, { gap: 14 }]}>
       <View style={styles.logoRow}>
-        <Logo />
+        <LogoGlow />
         <Text style={styles.logoWord}>Éveil</Text>
       </View>
       <Text style={styles.title}>Modifier ton profil</Text>

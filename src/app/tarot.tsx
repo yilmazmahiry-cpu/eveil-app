@@ -1,15 +1,14 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton, TextButton } from '@/components/Buttons';
-import { Card, ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
+import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
+import { OracleCardVisual } from '@/components/OracleCardVisual';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { SUIT_LABELS, TAROT_DECK, TarotCard } from '@/data/tarotCards';
-import { colors } from '@/theme/colors';
-import { fonts } from '@/theme/typography';
 
 function drawCard(): { card: TarotCard; reversed: boolean } {
   const card = TAROT_DECK[Math.floor(Math.random() * TAROT_DECK.length)];
@@ -57,11 +56,7 @@ export default function TarotScreen() {
       <ScreenHeader title="Tarot" />
       <ScreenIntro center>Tire une carte et laisse-la éclairer ta journée.</ScreenIntro>
 
-      <Card style={styles.cardBox}>
-        <Text style={styles.cardName}>{card.name}</Text>
-        <Text style={styles.orientation}>{orientation}</Text>
-        <Text style={styles.meaning}>{meaning}</Text>
-      </Card>
+      <OracleCardVisual name={card.name} meta={orientation} description={meaning} italic />
 
       <TextButton title="Nouveau tirage" onPress={newDraw} style={{ alignSelf: 'center', marginTop: 4 }} />
 
@@ -89,9 +84,5 @@ export default function TarotScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 24, paddingBottom: 40 },
-  cardBox: { marginTop: 18, alignItems: 'center' },
-  cardName: { fontFamily: fonts.serifSemiBold, fontSize: 22, color: colors.gold, textAlign: 'center' },
-  orientation: { fontFamily: fonts.sans, fontSize: 12, color: colors.inkMuted, marginTop: 4, marginBottom: 12 },
-  meaning: { fontFamily: fonts.serifItalic, fontStyle: 'italic', fontSize: 15, color: colors.ink, textAlign: 'center', lineHeight: 22 },
   resultZone: { marginTop: 20, gap: 4 },
 });

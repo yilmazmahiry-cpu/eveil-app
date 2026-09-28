@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Logo } from '@/components/Logo';
+import { LogoGlow } from '@/components/LogoGlow';
 import { RitualsPanel } from '@/components/RitualsPanel';
 import { RitualsProgress } from '@/components/RitualsProgress';
 import { Screen } from '@/components/Screen';
@@ -34,7 +34,7 @@ export default function HomeScreen() {
   return (
     <Screen edges={['top']} contentContainerStyle={styles.content}>
       <View style={styles.logoRow}>
-        <Logo />
+        <LogoGlow />
         <Text style={styles.logoWord}>Éveil</Text>
       </View>
 

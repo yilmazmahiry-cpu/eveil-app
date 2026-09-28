@@ -3,7 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
-import { Card, ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
+import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
+import { OracleCardVisual } from '@/components/OracleCardVisual';
 import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
@@ -62,11 +63,8 @@ export default function LuneScreen() {
         <Text style={styles.ritual}>{moon.ritual}</Text>
       </View>
 
-      <Card style={{ marginTop: 22 }}>
-        <Text style={styles.cardTitle}>Carte oracle du jour</Text>
-        <Text style={styles.oracleName}>{card.name}</Text>
-        <Text style={styles.oracleSens}>{card.sens}</Text>
-      </Card>
+      <Text style={styles.cardLabel}>Carte oracle du jour</Text>
+      <OracleCardVisual name={card.name} description={card.sens} />
 
       <PrimaryButton title="Lecture du jour" onPress={handlePress} loading={loading} style={{ marginTop: 18 }} />
 
@@ -98,8 +96,13 @@ const styles = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(203,163,92,0.25)' },
   dotActive: { backgroundColor: colors.gold },
   ritual: { fontFamily: fonts.sans, fontSize: 13, color: colors.inkMuted, textAlign: 'center' },
-  cardTitle: { fontFamily: fonts.sansBold, fontSize: 14.5, color: colors.inkMuted, marginBottom: 4 },
-  oracleName: { fontFamily: fonts.serifSemiBold, fontSize: 19, color: colors.gold, textAlign: 'center', marginVertical: 6 },
-  oracleSens: { fontFamily: fonts.sans, fontSize: 13.5, color: colors.inkMuted, textAlign: 'center' },
+  cardLabel: {
+    fontFamily: fonts.sansBold,
+    fontSize: 13,
+    letterSpacing: 0.4,
+    color: colors.inkMuted,
+    textAlign: 'center',
+    marginTop: 22,
+  },
   resultZone: { marginTop: 20, gap: 4 },
 });
