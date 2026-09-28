@@ -1,4 +1,5 @@
-import { Link, useRouter } from 'expo-router';
+import { makeRedirectUri } from 'expo-auth-session';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import { Keyboard, StyleSheet, Text } from 'react-native';
 
@@ -10,42 +11,51 @@ import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
-export default function LoginScreen() {
-  const router = useRouter();
+export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     Keyboard.dismiss();
-    if (!email.trim() || !password) {
-      setError('Renseigne ton email et ton mot de passe.');
+    if (!email.trim()) {
+      setError('Renseigne ton email.');
       return;
     }
     setError('');
     setSubmitting(true);
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: makeRedirectUri({ path: 'reset-password' }),
     });
     setSubmitting(false);
-    if (signInError) {
-      const translations: Record<string, string> = {
-        'Invalid login credentials': 'Email ou mot de passe incorrect.',
-        'Email not confirmed': 'Ton email n’est pas encore confirmé. Vérifie ta boîte mail et clique sur le lien reçu.',
-      };
-      setError(translations[signInError.message] ?? signInError.message);
+    if (resetError) {
+      setError(resetError.message);
       return;
     }
-    router.replace('/');
+    setSent(true);
   };
+
+  if (sent) {
+    return (
+      <Screen contentContainerStyle={styles.content}>
+        <Logo />
+        <Text style={styles.title}>Vérifie ta boîte mail</Text>
+        <Text style={styles.subtitle}>
+          On t’a envoyé un lien à {email.trim()} pour choisir un nouveau mot de passe.
+        </Text>
+        <Link href="/login" replace style={styles.link}>
+          Retour à la connexion
+        </Link>
+      </Screen>
+    );
+  }
 
   return (
     <Screen contentContainerStyle={styles.content}>
       <Logo />
-      <Text style={styles.title}>Content de te revoir</Text>
-      <Text style={styles.subtitle}>Connecte-toi pour retrouver ton profil.</Text>
+      <Text style={styles.title}>Mot de passe oublié</Text>
+      <Text style={styles.subtitle}>On t’enverra un lien par email pour en choisir un nouveau.</Text>
 
       <LabeledField label="Email">
         <StyledTextInput
@@ -55,17 +65,6 @@ export default function LoginScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
-          returnKeyType="next"
-        />
-      </LabeledField>
-
-      <LabeledField label="Mot de passe">
-        <StyledTextInput
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Ton mot de passe"
-          secureTextEntry
-          autoCapitalize="none"
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
         />
@@ -73,13 +72,10 @@ export default function LoginScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <PrimaryButton title="Se connecter" onPress={handleSubmit} loading={submitting} />
+      <PrimaryButton title="Envoyer le lien" onPress={handleSubmit} loading={submitting} />
 
-      <Link href="/forgot-password" style={styles.link}>
-        Mot de passe oublié ?
-      </Link>
-      <Link href="/signup" replace style={styles.link}>
-        Créer un compte
+      <Link href="/login" replace style={styles.link}>
+        Retour à la connexion
       </Link>
     </Screen>
   );
