@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { useProfile } from '@/context/ProfileContext';
-import { cancelDailyReminder, requestNotificationPermission, scheduleDailyReminder } from '@/lib/notifications';
+import { cancelDailyReminder, getExpoPushToken, requestNotificationPermission, scheduleDailyReminder } from '@/lib/notifications';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
@@ -15,7 +15,7 @@ const PRESETS = [
 ];
 
 export function NotificationSettings() {
-  const { profile, saveProfile } = useProfile();
+  const { profile, saveProfile, savePushToken } = useProfile();
   const [denied, setDenied] = useState(false);
 
   if (!profile) return null;
@@ -29,6 +29,8 @@ export function NotificationSettings() {
       }
       setDenied(false);
       await scheduleDailyReminder(profile.notifHour, 0);
+      const token = await getExpoPushToken();
+      if (token) await savePushToken(token);
     } else {
       await cancelDailyReminder();
     }

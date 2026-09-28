@@ -11,3 +11,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
 export async function scheduleDailyReminder(_hour: number, _minute: number): Promise<void> {}
 
 export async function cancelDailyReminder(): Promise<void> {}
+
+export async function getExpoPushToken(): Promise<string | null> {
+  return null;
+}

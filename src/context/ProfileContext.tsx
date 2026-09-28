@@ -13,6 +13,7 @@ type ProfileContextValue = {
   journal: JournalEntry[];
   streak: Streak;
   saveProfile: (profile: Profile) => Promise<void>;
+  savePushToken: (token: string) => Promise<void>;
   deleteProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   addJournalEntry: (type: JournalType, input: string, result: string) => Promise<JournalEntry>;
@@ -107,6 +108,14 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     [session]
   );
 
+  const savePushToken = useCallback(
+    async (token: string) => {
+      if (!session) return;
+      await supabase.from('profiles').update({ push_token: token }).eq('id', session.user.id);
+    },
+    [session]
+  );
+
   const deleteProfile = useCallback(async () => {
     if (!session) return;
     const { error } = await supabase.functions.invoke('delete-account');
@@ -178,6 +187,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       journal,
       streak,
       saveProfile,
+      savePushToken,
       deleteProfile,
       signOut,
       addJournalEntry,
@@ -186,7 +196,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setFeedback,
       getCurrentIntention,
     }),
-    [loading, session, profile, journal, streak, saveProfile, deleteProfile, signOut, addJournalEntry, toggleFavorite, toggleRealized, setFeedback, getCurrentIntention]
+    [loading, session, profile, journal, streak, saveProfile, savePushToken, deleteProfile, signOut, addJournalEntry, toggleFavorite, toggleRealized, setFeedback, getCurrentIntention]
   );
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;

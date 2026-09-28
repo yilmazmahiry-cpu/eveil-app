@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
@@ -46,4 +47,15 @@ export async function scheduleDailyReminder(hour: number, minute: number): Promi
 
 export async function cancelDailyReminder(): Promise<void> {
   await Notifications.cancelScheduledNotificationAsync(REMINDER_ID_KEY).catch(() => {});
+}
+
+export async function getExpoPushToken(): Promise<string | null> {
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+  if (!projectId) return null;
+  try {
+    const { data } = await Notifications.getExpoPushTokenAsync({ projectId });
+    return data;
+  } catch {
+    return null;
+  }
 }
