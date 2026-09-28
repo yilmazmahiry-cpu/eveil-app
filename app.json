@@ -8,6 +8,10 @@
     "scheme": "eveilapp",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#12142B",
+    "ios": {
+      "bundleIdentifier": "com.yilmazmahir.eveilapp",
+      "supportsTablet": false
+    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#12142B",
