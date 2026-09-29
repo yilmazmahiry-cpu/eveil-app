@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — Éveil</title>
+<style>
+  :root {
+    --bg: #12142B;
+    --bg-outer: #0b0c1c;
+    --gold: #CBA35C;
+    --ink: #F5F1E6;
+    --ink-muted: #9295B5;
+    --border: rgba(203,163,92,0.22);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg-outer);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 40px 20px 80px;
+    line-height: 1.65;
+  }
+  .page { max-width: 680px; margin: 0 auto; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo { width: 28px; height: 28px; }
+  .logo-word { font-size: 15px; color: var(--ink-muted); }
+  h1 { font-size: 26px; margin: 18px 0 4px; }
+  .updated { color: var(--ink-muted); font-size: 13px; margin-bottom: 32px; }
+  h2 {
+    font-size: 17px;
+    color: var(--gold);
+    margin-top: 34px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  p, li { font-size: 15px; color: var(--ink); }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--gold); }
+  strong { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="logo-row">
+    <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="8.3" stroke="#CBA35C" stroke-width="1.4"/>
+      <circle cx="15.3" cy="8.7" r="1.6" fill="#CBA35C"/>
+    </svg>
+    <span class="logo-word">Éveil</span>
+  </div>
+
+  <h1>Politique de confidentialité</h1>
+  <p class="updated">Dernière mise à jour : 29 septembre 2026</p>
+
+  <p>Éveil ("l'application", "nous") est une application de spiritualité et d'astrologie éditée par un développeur indépendant. Cette politique explique quelles données nous collectons, pourquoi, et comment tu peux les contrôler.</p>
+
+  <h2>1. Données que nous collectons</h2>
+  <p><strong>Compte</strong> : ton adresse email et ton mot de passe (le mot de passe est chiffré, nous n'y avons jamais accès en clair).</p>
+  <p><strong>Profil</strong> : prénom, nom (facultatif), date de naissance, heure de naissance (facultatif), lieu de naissance (facultatif). Ces informations servent uniquement à calculer ton signe astrologique, ton ascendant, ta lune, ton chemin de vie et tes nombres de numérologie.</p>
+  <p><strong>Contenu que tu crées</strong> : les entrées de ton journal (heures miroir, rêves, tirages, etc.), tes gratitudes quotidiennes, ta série de jours consécutifs ("streak").</p>
+  <p><strong>Notifications</strong> : si tu actives les rappels, un identifiant technique de ton appareil (jeton push) est stocké pour pouvoir t'envoyer une notification.</p>
+  <p><strong>Abonnement</strong> : si tu t'abonnes, Apple gère directement le paiement — nous ne voyons jamais tes informations bancaires. Nous recevons seulement la confirmation que ton abonnement est actif.</p>
+  <p>Nous ne collectons aucune donnée de localisation précise, aucun contact, et nous n'utilisons aucun traceur publicitaire.</p>
+
+  <h2>2. Pourquoi nous utilisons ces données</h2>
+  <ul>
+    <li>Créer et sécuriser ton compte</li>
+    <li>Calculer tes informations astrologiques et générer tes lectures personnalisées</li>
+    <li>Sauvegarder ton journal et ta progression pour que tu les retrouves sur tous tes appareils</li>
+    <li>T'envoyer les notifications que tu as toi-même activées</li>
+    <li>Gérer ton abonnement Premium</li>
+  </ul>
+  <p>Nous ne vendons ni ne partageons tes données à des fins publicitaires.</p>
+
+  <h2>3. Avec qui nous partageons des données</h2>
+  <p>Pour faire fonctionner l'application, certaines données transitent par des prestataires techniques, chacun n'ayant accès qu'à ce qui lui est nécessaire :</p>
+  <ul>
+    <li><strong>Supabase</strong> (hébergement de la base de données et authentification, Union Européenne)</li>
+    <li><strong>Anthropic</strong> (génère le texte de tes lectures personnalisées à partir de ton prénom, signe et des informations que tu saisis — jamais ton email ni ton mot de passe)</li>
+    <li><strong>Render</strong> (héberge notre serveur qui fait le lien entre l'application et Anthropic)</li>
+    <li><strong>Expo</strong> (envoi technique des notifications push)</li>
+    <li><strong>RevenueCat</strong> (gestion de l'abonnement)</li>
+    <li><strong>Apple</strong> (App Store, paiement, compte)</li>
+    <li><strong>OpenStreetMap / Nominatim</strong> (convertit le nom de ta ville de naissance en coordonnées, uniquement si tu renseignes un lieu)</li>
+  </ul>
+  <p>Aucun de ces prestataires n'est autorisé à utiliser tes données à ses propres fins.</p>
+
+  <h2>4. Combien de temps nous gardons tes données</h2>
+  <p>Tant que ton compte existe. Si tu supprimes ton compte depuis l'application (Profil → Supprimer mon compte), toutes tes données personnelles et ton compte de connexion sont supprimés immédiatement et définitivement.</p>
+
+  <h2>5. Tes droits</h2>
+  <p>Conformément au RGPD, tu peux à tout moment :</p>
+  <ul>
+    <li><strong>Accéder</strong> à tes données (elles sont visibles directement dans l'app : profil, journal, gratitude)</li>
+    <li><strong>Corriger</strong> ton profil depuis l'écran "Modifier mes informations"</li>
+    <li><strong>Supprimer</strong> ton compte et toutes tes données depuis l'écran Profil</li>
+    <li><strong>Te désabonner</strong> des notifications à tout moment dans les réglages</li>
+  </ul>
+  <p>Pour toute question, écris-nous à <a href="mailto:yilmazmahir.y@gmail.com">yilmazmahir.y@gmail.com</a>.</p>
+
+  <h2>6. Âge minimum</h2>
+  <p>Éveil ne s'adresse pas aux enfants de moins de 16 ans. Nous ne collectons pas sciemment de données concernant des mineurs de moins de 16 ans.</p>
+
+  <h2>7. Sécurité</h2>
+  <p>Tes données sont chiffrées en transit (HTTPS) et protégées par des règles d'accès strictes (chaque utilisateur ne peut voir que ses propres données). Aucun système n'est infaillible, mais nous mettons en œuvre les mesures raisonnables pour protéger tes informations.</p>
+
+  <h2>8. Modifications</h2>
+  <p>Cette politique peut évoluer avec l'application. Toute modification importante te sera signalée dans l'app.</p>
+</div>
+</body>
+</html>
