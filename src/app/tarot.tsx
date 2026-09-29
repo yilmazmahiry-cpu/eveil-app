@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
 import { PrimaryButton, TextButton } from '@/components/Buttons';
@@ -9,6 +9,11 @@ import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { SUIT_LABELS, TAROT_DECK, TarotCard } from '@/data/tarotCards';
+import { getDailyCache, setDailyCache } from '@/lib/dailyCache';
+import { colors } from '@/theme/colors';
+import { fonts } from '@/theme/typography';
+
+const TAROT_DAILY_LIMIT = 5;
 
 function drawCard(): { card: TarotCard; reversed: boolean } {
   const card = TAROT_DECK[Math.floor(Math.random() * TAROT_DECK.length)];
@@ -22,6 +27,13 @@ export default function TarotScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [result, setResult] = useState<{ id: string; text: string; feedback: 'up' | 'down' | null } | null>(null);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    getDailyCache<number>('tarot').then((cached) => {
+      setCount(cached ?? 0);
+    });
+  }, []);
 
   const newDraw = useCallback(() => {
     setDraw(drawCard());
@@ -34,8 +46,10 @@ export default function TarotScreen() {
   const { card, reversed } = draw;
   const meaning = reversed ? card.reversed : card.upright;
   const orientation = reversed ? 'Inversée' : 'Droite';
+  const limitReached = count >= TAROT_DAILY_LIMIT;
 
   const handlePress = async () => {
+    if (limitReached) return;
     setLoading(true);
     setError(false);
     setResult(null);
@@ -45,6 +59,9 @@ export default function TarotScreen() {
       const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
       const entry = await addJournalEntry('tarot', `${card.name} — ${orientation}`, text);
       setResult({ id: entry.id, text, feedback: null });
+      const next = count + 1;
+      setCount(next);
+      await setDailyCache('tarot', next);
     } catch {
       setError(true);
     }
@@ -60,7 +77,18 @@ export default function TarotScreen() {
 
       <TextButton title="Nouveau tirage" onPress={newDraw} style={{ alignSelf: 'center', marginTop: 4 }} />
 
-      <PrimaryButton title="Lecture personnalisée" onPress={handlePress} loading={loading} style={{ marginTop: 18 }} />
+      <PrimaryButton
+        title="Lecture personnalisée"
+        onPress={handlePress}
+        loading={loading}
+        disabled={limitReached}
+        style={{ marginTop: 18 }}
+      />
+      <Text style={styles.limitText}>
+        {limitReached
+          ? 'Limite de 5 lectures atteinte pour aujourd’hui — reviens demain.'
+          : `${TAROT_DAILY_LIMIT - count} lecture${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} restante${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} aujourd’hui`}
+      </Text>
 
       <View style={styles.resultZone}>
         {loading && !result && <LoadingDots />}
@@ -85,4 +113,11 @@ export default function TarotScreen() {
 const styles = StyleSheet.create({
   container: { padding: 24, paddingBottom: 40 },
   resultZone: { marginTop: 20, gap: 4 },
+  limitText: {
+    fontFamily: fonts.sans,
+    fontSize: 12,
+    color: colors.inkMuted,
+    textAlign: 'center',
+    marginTop: 8,
+  },
 });

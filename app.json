@@ -10,7 +10,10 @@
     "backgroundColor": "#12142B",
     "ios": {
       "bundleIdentifier": "com.yilmazmahir.eveilapp",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {

@@ -85,7 +85,7 @@ create policy "gratitude_own" on gratitude_entries
 -- DAILY CACHE (carte du jour, affirmations) --------------------------------
 create table daily_cache (
   user_id uuid not null references auth.users(id) on delete cascade,
-  kind text not null check (kind in ('carte', 'affirmations')),
+  kind text not null check (kind in ('carte', 'affirmations', 'tarot')),
   date date not null,
   content jsonb not null,
   primary key (user_id, kind, date)

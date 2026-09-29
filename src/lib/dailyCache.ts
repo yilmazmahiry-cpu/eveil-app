@@ -1,7 +1,7 @@
 import { todayISO } from './hash';
 import { supabase } from './supabase';
 
-type CacheKind = 'carte' | 'affirmations';
+type CacheKind = 'carte' | 'affirmations' | 'tarot';
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();

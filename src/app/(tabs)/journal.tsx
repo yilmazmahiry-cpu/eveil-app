@@ -3,11 +3,34 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Card, FavoriteButton } from '@/components/Common';
-import { Logo } from '@/components/Logo';
+import {
+  ArbreVieIcon,
+  CompatIcon,
+  HeuresIcon,
+  LuneIcon,
+  ManifestationIcon,
+  ReveIcon,
+  SigneIcon,
+  TarotIcon,
+  ThemeIcon,
+} from '@/components/icons';
+import { LogoGlow } from '@/components/LogoGlow';
 import { useProfile } from '@/context/ProfileContext';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
-import { JOURNAL_LABELS, JournalEntry } from '@/types';
+import { JOURNAL_LABELS, JournalEntry, JournalType } from '@/types';
+
+const JOURNAL_ICONS: Partial<Record<JournalType, (props: { size?: number; color?: string }) => React.JSX.Element>> = {
+  heures: HeuresIcon,
+  reve: ReveIcon,
+  signe: SigneIcon,
+  lune: LuneIcon,
+  theme: ThemeIcon,
+  compat: CompatIcon,
+  manifestation: ManifestationIcon,
+  sephira: ArbreVieIcon,
+  tarot: TarotIcon,
+};
 
 type Filter = 'all' | 'fav';
 
@@ -27,7 +50,7 @@ export default function JournalScreen() {
         ListHeaderComponent={
           <>
             <View style={styles.logoRow}>
-              <Logo />
+              <LogoGlow />
               <Text style={styles.logoWord}>Éveil</Text>
             </View>
             <Text style={styles.title}>Ton journal</Text>
@@ -74,10 +97,18 @@ function JournalItem({
   onToggleRealized: () => void;
 }) {
   const date = new Date(entry.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  const Icon = JOURNAL_ICONS[entry.type];
   return (
     <View style={styles.item}>
       <View style={styles.itemHeader}>
-        <Text style={styles.itemType}>{JOURNAL_LABELS[entry.type]}</Text>
+        <View style={styles.itemTypeRow}>
+          {Icon ? (
+            <View style={styles.itemIcon}>
+              <Icon size={13} />
+            </View>
+          ) : null}
+          <Text style={styles.itemType}>{JOURNAL_LABELS[entry.type]}</Text>
+        </View>
         <FavoriteButton active={entry.fav} onPress={onToggleFav} />
       </View>
       <Text style={styles.itemInput}>{entry.input}</Text>
@@ -138,6 +169,15 @@ const styles = StyleSheet.create({
   empty: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 21, color: colors.inkMuted },
   item: { borderBottomWidth: 1, borderBottomColor: colors.hairline, paddingVertical: 15 },
   itemHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  itemTypeRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
+  itemIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.goldSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   itemType: { fontFamily: fonts.sansBold, fontSize: 12, color: colors.gold },
   itemInput: { fontFamily: fonts.sans, fontSize: 13, color: colors.inkMuted, marginVertical: 7, lineHeight: 18 },
   itemResult: { fontFamily: fonts.serifItalic, fontStyle: 'italic', fontSize: 14, color: colors.ink, lineHeight: 21 },
