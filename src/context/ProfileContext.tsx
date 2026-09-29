@@ -1,8 +1,19 @@
 import { Session } from '@supabase/supabase-js';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { PurchasesOffering, PurchasesPackage } from 'react-native-purchases';
 
 import { todayISO } from '@/lib/hash';
 import { profileToRow, rowToProfile } from '@/lib/profileMapper';
+import {
+  configurePurchases,
+  getCurrentOffering,
+  isPremiumFromInfo,
+  loginPurchases,
+  logoutPurchases,
+  onCustomerInfoUpdate,
+  purchasePackage as purchasePackageSdk,
+  restorePurchases as restorePurchasesSdk,
+} from '@/lib/purchases';
 import { supabase } from '@/lib/supabase';
 import { GratitudeEntry, JournalEntry, JournalType, Profile, Streak } from '@/types';
 
@@ -21,6 +32,10 @@ type ProfileContextValue = {
   toggleRealized: (id: string) => Promise<void>;
   setFeedback: (id: string, feedback: 'up' | 'down') => Promise<void>;
   getCurrentIntention: () => JournalEntry | null;
+  isPremium: boolean;
+  offering: PurchasesOffering | null;
+  purchasePackage: (pkg: PurchasesPackage) => Promise<void>;
+  restorePurchases: () => Promise<void>;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -44,6 +59,15 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [journal, setJournal] = useState<JournalEntry[]>([]);
   const [streak, setStreak] = useState<Streak>({ count: 0, lastDate: null });
+  const [isPremium, setIsPremium] = useState(false);
+  const [offering, setOffering] = useState<PurchasesOffering | null>(null);
+
+  // RevenueCat: configure once, then listen for entitlement changes.
+  useEffect(() => {
+    configurePurchases();
+    getCurrentOffering().then(setOffering);
+    return onCustomerInfoUpdate((info) => setIsPremium(isPremiumFromInfo(info)));
+  }, []);
 
   // Session bootstrap + subscription.
   useEffect(() => {
@@ -62,6 +86,19 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // Tie RevenueCat's user identity to the Supabase session so purchases follow the account.
+  useEffect(() => {
+    if (session) {
+      loginPurchases(session.user.id).then((info) => {
+        if (info) setIsPremium(isPremiumFromInfo(info));
+      });
+    } else {
+      logoutPurchases();
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- no session means logged out, nothing to await before resetting
+      setIsPremium(false);
+    }
+  }, [session]);
 
   // Profile + journal load whenever the authenticated user changes.
   useEffect(() => {
@@ -179,6 +216,16 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     [journal]
   );
 
+  const purchasePackage = useCallback(async (pkg: PurchasesPackage) => {
+    const info = await purchasePackageSdk(pkg);
+    setIsPremium(isPremiumFromInfo(info));
+  }, []);
+
+  const restorePurchases = useCallback(async () => {
+    const info = await restorePurchasesSdk();
+    setIsPremium(isPremiumFromInfo(info));
+  }, []);
+
   const value = useMemo(
     () => ({
       loading,
@@ -195,8 +242,31 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       toggleRealized,
       setFeedback,
       getCurrentIntention,
+      isPremium,
+      offering,
+      purchasePackage,
+      restorePurchases,
     }),
-    [loading, session, profile, journal, streak, saveProfile, savePushToken, deleteProfile, signOut, addJournalEntry, toggleFavorite, toggleRealized, setFeedback, getCurrentIntention]
+    [
+      loading,
+      session,
+      profile,
+      journal,
+      streak,
+      saveProfile,
+      savePushToken,
+      deleteProfile,
+      signOut,
+      addJournalEntry,
+      toggleFavorite,
+      toggleRealized,
+      setFeedback,
+      getCurrentIntention,
+      isPremium,
+      offering,
+      purchasePackage,
+      restorePurchases,
+    ]
   );
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>;

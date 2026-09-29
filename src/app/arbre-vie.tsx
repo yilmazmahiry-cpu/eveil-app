@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Text as SvgText } from 'react-native-svg';
@@ -14,7 +15,8 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function ArbreVieScreen() {
-  const { profile, addJournalEntry, setFeedback } = useProfile();
+  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const router = useRouter();
   const defaultSephira = useMemo(() => {
     if (!profile) return SEPHIROT[0];
     const idx = simpleHash(todayISO() + profile.prenom) % SEPHIROT.length;
@@ -31,6 +33,10 @@ export default function ArbreVieScreen() {
   SEPHIROT.forEach((s) => (nodeByKey[s.key] = s));
 
   const handlePress = async () => {
+    if (!isPremium) {
+      router.push('/paywall');
+      return;
+    }
     setLoading(true);
     setError(false);
     setResult(null);

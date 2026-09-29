@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -22,7 +23,8 @@ function drawCard(): { card: TarotCard; reversed: boolean } {
 }
 
 export default function TarotScreen() {
-  const { profile, addJournalEntry, setFeedback } = useProfile();
+  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const router = useRouter();
   const [draw, setDraw] = useState(drawCard);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -49,6 +51,10 @@ export default function TarotScreen() {
   const limitReached = count >= TAROT_DAILY_LIMIT;
 
   const handlePress = async () => {
+    if (!isPremium) {
+      router.push('/paywall');
+      return;
+    }
     if (limitReached) return;
     setLoading(true);
     setError(false);
@@ -81,13 +87,15 @@ export default function TarotScreen() {
         title="Lecture personnalisée"
         onPress={handlePress}
         loading={loading}
-        disabled={limitReached}
+        disabled={isPremium && limitReached}
         style={{ marginTop: 18 }}
       />
       <Text style={styles.limitText}>
-        {limitReached
-          ? 'Limite de 5 lectures atteinte pour aujourd’hui — reviens demain.'
-          : `${TAROT_DAILY_LIMIT - count} lecture${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} restante${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} aujourd’hui`}
+        {!isPremium
+          ? 'Fonctionnalité Premium'
+          : limitReached
+            ? 'Limite de 5 lectures atteinte pour aujourd’hui — reviens demain.'
+            : `${TAROT_DAILY_LIMIT - count} lecture${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} restante${TAROT_DAILY_LIMIT - count > 1 ? 's' : ''} aujourd’hui`}
       </Text>
 
       <View style={styles.resultZone}>

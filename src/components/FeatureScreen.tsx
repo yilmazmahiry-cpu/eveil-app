@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Keyboard, StyleSheet, View } from 'react-native';
 
@@ -30,7 +31,8 @@ export function FeatureScreen({
   submitLabel?: string;
   footer?: React.ReactNode;
 }) {
-  const { profile, addJournalEntry, setFeedback } = useProfile();
+  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const router = useRouter();
   const [value, setValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ id: string; text: string; feedback: 'up' | 'down' | null } | null>(null);
@@ -38,6 +40,10 @@ export function FeatureScreen({
 
   const handleSubmit = async () => {
     if (!value.trim() || !profile) return;
+    if (!isPremium) {
+      router.push('/paywall');
+      return;
+    }
     Keyboard.dismiss();
     setLoading(true);
     setError(false);

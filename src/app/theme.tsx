@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -11,7 +12,8 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function ThemeScreen() {
-  const { profile, addJournalEntry, setFeedback } = useProfile();
+  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [result, setResult] = useState<{ id: string; text: string; feedback: 'up' | 'down' | null } | null>(null);
@@ -21,6 +23,10 @@ export default function ThemeScreen() {
   const hasPreciseChart = !!(profile.ascendant && profile.signeLunaire);
 
   const handlePress = async () => {
+    if (!isPremium) {
+      router.push('/paywall');
+      return;
+    }
     setLoading(true);
     setError(false);
     setResult(null);

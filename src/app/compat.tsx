@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Keyboard, StyleSheet, Text, View } from 'react-native';
 
@@ -13,7 +14,8 @@ import { getSigne } from '@/lib/astrology';
 import { colors } from '@/theme/colors';
 
 export default function CompatScreen() {
-  const { profile, addJournalEntry, setFeedback } = useProfile();
+  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const router = useRouter();
   const [autrePrenom, setAutrePrenom] = useState('');
   const [date, setDate] = useState<DateValue>(defaultDateValue());
   const [error, setError] = useState('');
@@ -26,6 +28,10 @@ export default function CompatScreen() {
   const handleSubmit = async () => {
     if (!autrePrenom.trim()) {
       setError("Merci d'indiquer un prénom.");
+      return;
+    }
+    if (!isPremium) {
+      router.push('/paywall');
       return;
     }
     Keyboard.dismiss();
