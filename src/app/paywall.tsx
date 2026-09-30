@@ -10,7 +10,7 @@ import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 const FEATURES = [
-  'Lectures IA illimitées : Heures miroir, Rêve, Signe, Thème astral, Compatibilité, Manifestation, Arbre de vie',
+  'Lectures illimitées : Heures miroir, Rêve, Signe, Thème astral, Compatibilité, Manifestation, Arbre de vie',
   'Tarot : 5 lectures personnalisées par jour',
   'Notifications avec le vrai contenu de ta carte du jour',
 ];
