@@ -42,3 +42,6 @@ example
 # generated native folders
 /ios
 /android
+
+# marketing assets (generated locally, not app code)
+/appstore-screenshots
