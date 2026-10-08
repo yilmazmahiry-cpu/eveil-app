@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -36,6 +37,7 @@ type Filter = 'all' | 'fav';
 
 export default function JournalScreen() {
   const { journal, toggleFavorite, toggleRealized } = useProfile();
+  const router = useRouter();
   const [filter, setFilter] = useState<Filter>('all');
 
   const stats = useMemo(() => computeStats(journal), [journal]);
@@ -54,6 +56,13 @@ export default function JournalScreen() {
               <Text style={styles.logoWord}>Éveil</Text>
             </View>
             <Text style={styles.title}>Ton journal</Text>
+            <Pressable onPress={() => router.push('/bilan')}>
+              <Card style={{ marginBottom: 14 }}>
+                <Text style={styles.cardTitle}>Ton bilan</Text>
+                <Text style={styles.cardText}>Tes rituels, les mots qui reviennent et ta progression.</Text>
+                <Text style={styles.cardLink}>Voir mon bilan →</Text>
+              </Card>
+            </Pressable>
             <Card style={{ marginBottom: 20 }}>
               <Text style={styles.cardTitle}>Ce mois-ci</Text>
               <Text style={styles.cardText}>{stats.text}</Text>
@@ -161,6 +170,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: fonts.serifSemiBold, fontSize: 23, color: colors.ink, marginBottom: 18 },
   cardTitle: { fontFamily: fonts.sansBold, fontSize: 14.5, color: colors.inkMuted, marginBottom: 12 },
   cardText: { fontFamily: fonts.serifItalic, fontStyle: 'italic', fontSize: 15, color: colors.ink, lineHeight: 22 },
+  cardLink: { fontFamily: fonts.sansBold, fontSize: 13, color: colors.gold, marginTop: 12 },
   tabRow: { flexDirection: 'row', gap: 8, marginBottom: 18 },
   filterTab: { borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingVertical: 7, paddingHorizontal: 16 },
   filterTabActive: { backgroundColor: colors.goldSoft, borderColor: colors.goldBorderStrong },
