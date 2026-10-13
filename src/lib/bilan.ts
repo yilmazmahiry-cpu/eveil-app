@@ -1,3 +1,4 @@
+import { dateKey, daysAgoISO } from '@/lib/hash';
 import { supabase } from '@/lib/supabase';
 import { GratitudeEntry, JournalType } from '@/types';
 
@@ -13,7 +14,6 @@ export type Bilan = {
   busiestWeekday: string | null;
 };
 
-const DAY_MS = 86400000;
 const WEEKDAYS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
 
 // Mots courants sans valeur de "thème" (comparés sans accents).
@@ -32,7 +32,7 @@ function normalize(s: string): string {
 }
 
 function windowStartKey(days: number, now: Date): string {
-  return new Date(now.getTime() - (days - 1) * DAY_MS).toISOString().slice(0, 10);
+  return daysAgoISO(days - 1, now);
 }
 
 function tokenize(text: string): string[] {
@@ -48,12 +48,14 @@ export async function fetchBilanRows(days: number): Promise<{ journal: BilanJour
   if (!uid) return { journal: [], gratitudes: [] };
 
   const since = windowStartKey(days, new Date());
+  const [sinceYear, sinceMonth, sinceDay] = since.split('-').map(Number);
+  const sinceLocalMidnight = new Date(sinceYear, sinceMonth - 1, sinceDay).toISOString();
   const [{ data: journalRows }, { data: gratitudeRows }] = await Promise.all([
     supabase
       .from('journal_entries')
       .select('type,input,date,realized')
       .eq('user_id', uid)
-      .gte('date', `${since}T00:00:00.000Z`)
+      .gte('date', sinceLocalMidnight)
       .order('date', { ascending: false })
       .limit(500),
     supabase
@@ -77,13 +79,14 @@ export function computeBilan(
   now: Date = new Date()
 ): Bilan {
   const start = windowStartKey(days, now);
-  const inWindow = journal.filter((e) => e.date.slice(0, 10) >= start);
+  const dayOf = (e: BilanJournalRow) => dateKey(new Date(e.date));
+  const inWindow = journal.filter((e) => dayOf(e) >= start);
   const gratitudeInWindow = gratitudes
     .filter((g) => g.date >= start)
     .filter((g) => g.items.some((it) => (it ?? '').trim().length > 0));
 
   const activeKeys = new Set<string>();
-  inWindow.forEach((e) => activeKeys.add(e.date.slice(0, 10)));
+  inWindow.forEach((e) => activeKeys.add(dayOf(e)));
   gratitudeInWindow.forEach((g) => activeKeys.add(g.date));
 
   const intentionEntries = inWindow.filter((e) => e.type === 'manifestation');

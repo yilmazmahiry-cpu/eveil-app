@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { loadGratitudeForDate } from '@/context/ProfileContext';
 import { getDailyCache } from '@/lib/dailyCache';
-import { todayISO } from '@/lib/hash';
+import { dateKey, todayISO } from '@/lib/hash';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 import { JournalEntry } from '@/types';
@@ -27,7 +27,7 @@ export function RitualsProgress({ journal }: { journal: JournalEntry[] }) {
   );
 
   const today = todayISO();
-  const intentionDone = journal.some((e) => e.type === 'manifestation' && e.date.slice(0, 10) === today);
+  const intentionDone = journal.some((e) => e.type === 'manifestation' && dateKey(new Date(e.date)) === today);
 
   const items = [
     { label: 'Carte', done: carteDone },

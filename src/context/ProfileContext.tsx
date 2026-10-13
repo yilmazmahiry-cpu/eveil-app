@@ -2,7 +2,7 @@ import { Session } from '@supabase/supabase-js';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PurchasesOffering, PurchasesPackage } from 'react-native-purchases';
 
-import { todayISO } from '@/lib/hash';
+import { daysAgoISO, todayISO } from '@/lib/hash';
 import { profileToRow, rowToProfile } from '@/lib/profileMapper';
 import {
   configurePurchases,
@@ -170,7 +170,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       const { data: streakRow } = await supabase.from('streaks').select('*').eq('user_id', uid).maybeSingle();
       let current: Streak = streakRow ? { count: streakRow.count, lastDate: streakRow.last_date } : { count: 0, lastDate: null };
       if (current.lastDate !== today) {
-        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        const yesterday = daysAgoISO(1);
         current = { count: current.lastDate === yesterday ? (current.count || 0) + 1 : 1, lastDate: today };
         await supabase.from('streaks').upsert({ user_id: uid, count: current.count, last_date: current.lastDate });
       }

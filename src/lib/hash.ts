@@ -6,6 +6,20 @@ export function simpleHash(str: string): number {
   return h;
 }
 
+// Les "jours" de l'app (carte du jour, gratitudes, série) suivent l'heure locale de l'appareil,
+// pas l'UTC : sinon le jour changerait à 1h ou 2h du matin en France.
+export function dateKey(d: Date): string {
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  return dateKey(new Date());
+}
+
+export function daysAgoISO(days: number, from: Date = new Date()): string {
+  const d = new Date(from);
+  d.setDate(d.getDate() - days);
+  return dateKey(d);
 }
