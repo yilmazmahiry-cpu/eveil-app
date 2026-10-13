@@ -22,7 +22,8 @@ const STOPWORDS = new Set(
     'avec dans pour mais plus tout tous toute toutes cette cela comme etre avoir fait faire sont etait suis tres bien ' +
     'aussi encore alors donc ainsi chaque entre depuis sans sous vers chez leur leurs nous vous elle elles quand dont ' +
     'ceci celui celle ceux rien quelque quelques jour journee aujourd moment chose choses merci grace notre votre ' +
-    'cest mes tes ses mon ton son sur par aux des les une que qui pas ete ont ils eux moi toi lui'
+    'cest mes tes ses mon ton son sur par aux des les une que qui pas ete ont ils eux moi toi lui ' +
+    'apres avant pendant malgre selon contre parmi autour voici voila meme ceux cela celui'
   ).split(' ')
 );
 
