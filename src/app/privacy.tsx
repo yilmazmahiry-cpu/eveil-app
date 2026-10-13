@@ -25,7 +25,7 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: '3. Avec qui nous partageons des données',
     body:
-      'Supabase (base de données et authentification, UE), Anthropic (génère tes lectures à partir de ton prénom, signe, saisies et d’un court résumé de tes intentions et gratitudes récentes — jamais ton email ni ton mot de passe), Render (héberge notre serveur), Expo (envoi des notifications), RevenueCat (gestion de l’abonnement), Apple (App Store, paiement), OpenStreetMap / Nominatim (convertit ta ville de naissance en coordonnées, si renseignée).\n\n' +
+      'Supabase (base de données et authentification, UE), Anthropic (génère tes lectures à partir de ton prénom, signe, saisies, d’un court résumé de tes intentions et gratitudes récentes, et du début et de la fin de tes dernières lectures pour que chaque texte soit différent — jamais ton email ni ton mot de passe), Render (héberge notre serveur), Expo (envoi des notifications), RevenueCat (gestion de l’abonnement), Apple (App Store, paiement), OpenStreetMap / Nominatim (convertit ta ville de naissance en coordonnées, si renseignée).\n\n' +
       'Aucun de ces prestataires n’est autorisé à utiliser tes données à ses propres fins.',
   },
   {
