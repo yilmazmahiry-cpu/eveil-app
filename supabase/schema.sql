@@ -31,12 +31,13 @@ create table profiles (
 
 alter table profiles enable row level security;
 
+-- (select auth.uid()) : évalué une seule fois par requête et non à chaque ligne.
 create policy "profiles_select_own" on profiles
-  for select using (auth.uid() = id);
+  for select using ((select auth.uid()) = id);
 create policy "profiles_insert_own" on profiles
-  for insert with check (auth.uid() = id);
+  for insert with check ((select auth.uid()) = id);
 create policy "profiles_update_own" on profiles
-  for update using (auth.uid() = id);
+  for update using ((select auth.uid()) = id);
 
 -- JOURNAL ENTRIES ---------------------------------------------------------
 create table journal_entries (
@@ -55,7 +56,7 @@ create index journal_entries_user_date_idx on journal_entries (user_id, date des
 
 alter table journal_entries enable row level security;
 create policy "journal_own" on journal_entries
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
 -- STREAKS -------------------------------------------------------------
 create table streaks (
@@ -66,7 +67,7 @@ create table streaks (
 
 alter table streaks enable row level security;
 create policy "streaks_own" on streaks
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
 -- GRATITUDE ---------------------------------------------------------------
 create table gratitude_entries (
@@ -81,7 +82,7 @@ create table gratitude_entries (
 
 alter table gratitude_entries enable row level security;
 create policy "gratitude_own" on gratitude_entries
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
 -- DAILY CACHE (carte du jour, affirmations) --------------------------------
 create table daily_cache (
@@ -94,38 +95,9 @@ create table daily_cache (
 
 alter table daily_cache enable row level security;
 create policy "daily_cache_own" on daily_cache
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 
--- FRIENDSHIPS (compatibilité sociale persistante) --------------------------
-create table friendships (
-  id uuid primary key default gen_random_uuid(),
-  requester_id uuid not null references auth.users(id) on delete cascade,
-  addressee_id uuid not null references auth.users(id) on delete cascade,
-  status text not null default 'pending' check (status in ('pending', 'accepted')),
-  created_at timestamptz not null default now(),
-  unique (requester_id, addressee_id)
-);
-
-alter table friendships enable row level security;
-create policy "friendships_select" on friendships
-  for select using (auth.uid() = requester_id or auth.uid() = addressee_id);
-create policy "friendships_insert" on friendships
-  for insert with check (auth.uid() = requester_id);
-create policy "friendships_update" on friendships
-  for update using (auth.uid() = addressee_id) with check (auth.uid() = addressee_id);
-create policy "friendships_delete" on friendships
-  for delete using (auth.uid() = requester_id or auth.uid() = addressee_id);
-
--- Permet à deux amis acceptés de lire mutuellement leur profil (signe,
--- ascendant, prénom...) pour afficher la compatibilité en continu.
-create policy "profiles_select_friends" on profiles
-  for select using (
-    exists (
-      select 1 from friendships f
-      where f.status = 'accepted'
-        and (
-          (f.requester_id = auth.uid() and f.addressee_id = profiles.id)
-          or (f.addressee_id = auth.uid() and f.requester_id = profiles.id)
-        )
-    )
-  );
+-- La table "friendships" (fonctionnalité amis, jamais utilisée) et la règle "profiles_select_friends" ont été
+-- supprimées en production le 2026-10-13 (migration "remove_friendships_and_optimize_rls") : la règle d'insertion
+-- ne contrôlait pas le statut, donc un compte pouvait s'auto-déclarer ami "accepted" et lire le profil d'un autre.
+-- Les règles ci-dessus utilisent (select auth.uid()) pour la même raison de performance.
