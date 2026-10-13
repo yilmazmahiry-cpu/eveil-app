@@ -10,13 +10,14 @@ import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { ORACLE_CARDS } from '@/data/oracleCards';
-import { simpleHash, todayISO } from '@/lib/hash';
+import { dailyIndex } from '@/lib/dailyDraw';
+import { todayISO } from '@/lib/hash';
 import { getMoonPhaseFraction, getMoonPhaseIndex, MOON_PHASE_NAMES, MOON_RITUALS } from '@/lib/moon';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function LuneScreen() {
-  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const { profile, session, isPremium, addJournalEntry, setFeedback } = useProfile();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -29,11 +30,13 @@ export default function LuneScreen() {
     return { idx, phaseName: MOON_PHASE_NAMES[idx], ritual: MOON_RITUALS[idx] };
   }, []);
 
+  // Tirage propre à chaque compte, sans répétition avant d'avoir parcouru tout le jeu
+  // (même calcul que la notification du serveur : voir src/lib/dailyDraw.ts).
+  const userId = session?.user.id;
   const card = useMemo(() => {
-    if (!profile) return ORACLE_CARDS[0];
-    const idx = simpleHash(todayISO() + profile.prenom) % ORACLE_CARDS.length;
-    return ORACLE_CARDS[idx];
-  }, [profile]);
+    if (!userId) return ORACLE_CARDS[0];
+    return ORACLE_CARDS[dailyIndex(userId, todayISO(), ORACLE_CARDS.length, 'oracle')];
+  }, [userId]);
 
   if (!profile) return null;
 

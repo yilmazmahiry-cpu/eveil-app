@@ -10,18 +10,19 @@ import { Screen } from '@/components/Screen';
 import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { Sephira, SEPHIROT, SEPHIROT_PATHS } from '@/data/sephirot';
-import { simpleHash, todayISO } from '@/lib/hash';
+import { dailyIndex } from '@/lib/dailyDraw';
+import { todayISO } from '@/lib/hash';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
 
 export default function ArbreVieScreen() {
-  const { profile, isPremium, addJournalEntry, setFeedback } = useProfile();
+  const { profile, session, isPremium, addJournalEntry, setFeedback } = useProfile();
   const router = useRouter();
+  const userId = session?.user.id;
   const defaultSephira = useMemo(() => {
-    if (!profile) return SEPHIROT[0];
-    const idx = simpleHash(todayISO() + profile.prenom) % SEPHIROT.length;
-    return SEPHIROT[idx];
-  }, [profile]);
+    if (!userId) return SEPHIROT[0];
+    return SEPHIROT[dailyIndex(userId, todayISO(), SEPHIROT.length, 'sephira')];
+  }, [userId]);
   const [selected, setSelected] = useState<Sephira>(defaultSephira);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);

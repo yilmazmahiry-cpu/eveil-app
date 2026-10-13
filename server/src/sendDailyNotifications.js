@@ -2,21 +2,13 @@ import 'dotenv/config';
 
 import { createClient } from '@supabase/supabase-js';
 
+import { dailyIndex } from './dailyDraw.js';
 import { localDateAndHour } from './localTime.js';
 import { ORACLE_CARDS } from './oracleCards.js';
 
-function simpleHash(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h * 31 + str.charCodeAt(i)) >>> 0;
-  }
-  return h;
-}
-
-// Même formule que l'app (date locale de l'utilisateur + prénom) pour annoncer la carte qu'il verra.
-function cardForProfile(prenom, localDate) {
-  const idx = simpleHash(localDate + prenom) % ORACLE_CARDS.length;
-  return ORACLE_CARDS[idx];
+// Même tirage que l'app (identifiant du compte + date locale de la personne) pour annoncer la carte qu'elle verra.
+function cardForProfile(userId, localDate) {
+  return ORACLE_CARDS[dailyIndex(userId, localDate, ORACLE_CARDS.length, 'oracle')];
 }
 
 async function sendExpoPush(messages) {
@@ -42,7 +34,7 @@ async function main() {
   // L'heure choisie par l'utilisateur est son heure locale : on filtre ici, profil par profil.
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('prenom, push_token, notif_hour, timezone')
+    .select('id, prenom, push_token, notif_hour, timezone')
     .eq('notif_enabled', true)
     .not('push_token', 'is', null);
 
@@ -59,7 +51,7 @@ async function main() {
   }
 
   const messages = due.map((p) => {
-    const card = cardForProfile(p.prenom, localDateAndHour(now, p.timezone).date);
+    const card = cardForProfile(p.id, localDateAndHour(now, p.timezone).date);
     return {
       to: p.push_token,
       title: 'Éveil',
