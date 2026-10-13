@@ -44,9 +44,8 @@ export function buildMemoryText(
   if (parts.length === 0) return '';
 
   const text =
-    `Contexte personnel (tiré du journal de la personne, à utiliser avec discrétion) : ${parts.join(' ')} ` +
-    'Si c’est pertinent, fais un lien discret avec ce contexte (une intention en cours, un mot qui revient) ' +
-    'sans le réciter et sans inventer d’événements ; sinon, ignore-le.';
+    `Contexte personnel (journal de la personne, à utiliser avec discrétion) : ${parts.join(' ')} ` +
+    'Si pertinent, fais un lien discret, sans le réciter ni inventer d’événements ; sinon, ignore-le.';
   return text.slice(0, MAX_LENGTH);
 }
 
