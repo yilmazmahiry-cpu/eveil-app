@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Keyboard, StyleSheet, View } from 'react-native';
 
 import { askIA } from '@/api/ai';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { JournalType } from '@/types';
 
@@ -49,7 +48,7 @@ export function FeatureScreen({
     setError(false);
     setResult(null);
     try {
-      const text = await askIA(buildPrompt(value.trim()), SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(buildPrompt(value.trim()), 'general');
       const entry = await addJournalEntry(type, value.trim(), text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

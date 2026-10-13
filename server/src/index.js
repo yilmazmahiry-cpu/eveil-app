@@ -1,102 +1,48 @@
 import 'dotenv/config';
 
 import Anthropic from '@anthropic-ai/sdk';
-import cors from 'cors';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
 
-import { computeNatalChart } from './astrology.js';
+import { createApp } from './app.js';
+import { createTokenVerifier } from './auth.js';
+import { createPremiumChecker } from './premium.js';
 
 const PORT = process.env.PORT || 3000;
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
-const MAX_PROMPT_LENGTH = 4000;
+const STRICT = process.env.AI_STRICT === 'true';
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error('ANTHROPIC_API_KEY manquant : copie server/.env.example vers server/.env et renseigne ta clé.');
   process.exit(1);
 }
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Vérification des comptes : demande seulement SUPABASE_URL (publique). Sans elle, le serveur garde son
+// comportement historique (aucun compte exigé) et le dit au démarrage.
+const verifyToken = process.env.SUPABASE_URL
+  ? createTokenVerifier({ supabaseUrl: process.env.SUPABASE_URL, anonKey: process.env.SUPABASE_ANON_KEY })
+  : null;
 
-const app = express();
-app.use(express.json({ limit: '20kb' }));
-app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGIN ? process.env.ALLOWED_ORIGIN.split(',') : true,
-  })
+// Contrôle de l'abonnement côté serveur : demande REVENUECAT_SECRET_KEY (clé secrète, à saisir dans Render).
+const isPremium = process.env.REVENUECAT_SECRET_KEY
+  ? createPremiumChecker({ secretKey: process.env.REVENUECAT_SECRET_KEY })
+  : null;
+
+if (STRICT && !verifyToken) {
+  console.error('AI_STRICT=true nécessite SUPABASE_URL : sans lui, plus personne ne pourrait se connecter à l’IA.');
+  process.exit(1);
+}
+
+console.log(
+  `Sécurité IA : comptes ${verifyToken ? 'vérifiés' : 'NON vérifiés (SUPABASE_URL absent)'}, ` +
+    `abonnement ${isPremium ? 'contrôlé' : 'NON contrôlé (REVENUECAT_SECRET_KEY absent)'}, ` +
+    `mode ${STRICT ? 'strict' : 'compatible (anciennes versions de l’app acceptées)'}.`
 );
 
-// Protège la clé API : un budget de requêtes raisonnable par IP.
-app.use(
-  '/api/',
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 60,
-    standardHeaders: true,
-    legacyHeaders: false,
-  })
-);
-
-app.get('/health', (_req, res) => {
-  res.json({ ok: true });
-});
-
-app.post('/api/ai', async (req, res) => {
-  const { systemPrompt, userPrompt } = req.body ?? {};
-
-  if (typeof systemPrompt !== 'string' || typeof userPrompt !== 'string' || !systemPrompt.trim() || !userPrompt.trim()) {
-    return res.status(400).json({ error: 'systemPrompt et userPrompt sont requis.' });
-  }
-  if (systemPrompt.length > MAX_PROMPT_LENGTH || userPrompt.length > MAX_PROMPT_LENGTH) {
-    return res.status(400).json({ error: 'Prompt trop long.' });
-  }
-
-  try {
-    const response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-    });
-    const text = response.content
-      .map((block) => (block.type === 'text' ? block.text : ''))
-      .join('\n')
-      .trim();
-    res.json({ text });
-  } catch (err) {
-    console.error('Erreur Anthropic:', err);
-    res.status(502).json({ error: 'Le service IA est momentanément indisponible.' });
-  }
-});
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-const TIME_RE = /^\d{2}:\d{2}$/;
-
-app.post('/api/natal-chart', async (req, res) => {
-  const { date, time, place } = req.body ?? {};
-
-  if (
-    typeof date !== 'string' ||
-    typeof time !== 'string' ||
-    typeof place !== 'string' ||
-    !DATE_RE.test(date) ||
-    !TIME_RE.test(time) ||
-    !place.trim() ||
-    place.length > 200
-  ) {
-    return res.status(400).json({ error: 'date (YYYY-MM-DD), time (HH:MM) et place sont requis.' });
-  }
-
-  try {
-    const chart = await computeNatalChart({ date, time, place: place.trim() });
-    if (!chart) {
-      return res.status(404).json({ error: "Lieu de naissance introuvable." });
-    }
-    res.json(chart);
-  } catch (err) {
-    console.error('Erreur calcul thème natal:', err);
-    res.status(502).json({ error: 'Le calcul du thème natal a échoué.' });
-  }
+const app = createApp({
+  anthropic: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+  model: MODEL,
+  verifyToken,
+  isPremium,
+  strict: STRICT,
 });
 
 app.listen(PORT, () => {

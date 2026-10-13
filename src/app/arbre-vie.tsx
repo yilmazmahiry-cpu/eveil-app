@@ -7,7 +7,6 @@ import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { Card, ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
 import { Screen } from '@/components/Screen';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { Sephira, SEPHIROT, SEPHIROT_PATHS } from '@/data/sephirot';
 import { dailyIndex } from '@/lib/dailyDraw';
@@ -43,7 +42,7 @@ export default function ArbreVieScreen() {
     setResult(null);
     const prompt = `${profile.prenom} (signe : ${profile.signe}) explore aujourd'hui la séphira ${selected.name} (${selected.trad}) de l'arbre de vie kabbalistique, associée à : ${selected.theme} En t'inspirant de cette énergie et de la loi de l'attraction, propose une lecture personnalisée pour cette personne aujourd'hui.`;
     try {
-      const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(prompt, 'general');
       const entry = await addJournalEntry('sephira', selected.name, text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

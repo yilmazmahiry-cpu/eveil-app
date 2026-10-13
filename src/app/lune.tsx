@@ -7,7 +7,6 @@ import { PrimaryButton } from '@/components/Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
 import { OracleCardVisual } from '@/components/OracleCardVisual';
 import { Screen } from '@/components/Screen';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { ORACLE_CARDS } from '@/data/oracleCards';
 import { dailyIndex } from '@/lib/dailyDraw';
@@ -50,7 +49,7 @@ export default function LuneScreen() {
     setResult(null);
     const prompt = `${profile.prenom} (signe : ${profile.signe}) consulte l'application aujourd'hui. Phase lunaire du jour : ${moon.phaseName}. Carte oracle tirée : "${card.name}" (${card.sens}). Rédige une lecture personnalisée qui relie la phase de la lune et le message de cette carte pour cette personne aujourd'hui.`;
     try {
-      const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(prompt, 'general');
       const entry = await addJournalEntry('lune', `${moon.phaseName} — ${card.name}`, text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

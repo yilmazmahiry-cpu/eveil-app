@@ -50,11 +50,22 @@ exposée à l'app mobile (voir cahier des charges §5).
 
 ```
 POST /api/ai
-Body:  { "systemPrompt": string, "userPrompt": string }
-200:   { "text": string }
-400:   { "error": string }   — prompt manquant ou trop long
-502:   { "error": string }   — l'API Anthropic a échoué
+Header: Authorization: Bearer <jeton d'accès Supabase du compte connecté>
+Body:   { "promptType": "general" | "carte" | "affirmations", "extras"?: string, "userPrompt": string }
+200:    { "text": string }
+400:    { "error": string }   — type inconnu, extras (3000 car. max) ou userPrompt (4000 car. max) invalides
+401:    { "error": string }   — jeton absent (mode strict) ou invalide / expiré
+403:    { "error": "premium_required" }   — les lectures ("general") exigent un abonnement
+429:    { "error": string }   — trop de requêtes (60 par heure et par compte)
+502:    { "error": string }   — l'API Anthropic a échoué
 ```
+
+Les prompts système vivent dans `src/prompts.js` : l'app n'envoie que le type de prompt et des
+consignes complémentaires (`extras` : style, contexte du journal). Personne ne peut donc utiliser le
+serveur comme une IA généraliste en fournissant son propre prompt système.
+
+**Ancien format** (`{ "systemPrompt", "userPrompt" }`, sans jeton) : accepté tant que `AI_STRICT` n'est pas
+activé, pour que les versions déjà publiées ou en cours de validation continuent de fonctionner.
 
 ```
 POST /api/natal-chart
@@ -77,3 +88,27 @@ convient (Render, Railway, Fly.io...). Il suffit de définir la variable d'envir
 `ANTHROPIC_API_KEY` (et éventuellement `ALLOWED_ORIGIN` pour restreindre qui peut
 l'appeler) sur la plateforme choisie, puis de pointer `EXPO_PUBLIC_API_URL` de l'app vers
 l'URL publique obtenue.
+
+### Protection de l'IA (comptes, abonnement, limites)
+
+| Variable | Rôle | Secrète ? |
+|---|---|---|
+| `SUPABASE_URL` | Active la vérification des comptes (signature du jeton contrôlée avec la clé publique du projet). | Non |
+| `SUPABASE_ANON_KEY` | Secours uniquement (non nécessaire avec les clés de signature actuelles du projet). | Non (publique) |
+| `REVENUECAT_SECRET_KEY` | Active le contrôle de l'abonnement côté serveur pour les lectures. Clé **secrète** v1 de RevenueCat (Project settings > API keys). | **Oui** |
+| `AI_STRICT` | `true` : jeton obligatoire et ancien format refusé. | Non |
+
+Sans `SUPABASE_URL`, le serveur garde son comportement historique (aucun compte exigé). Sans
+`REVENUECAT_SECRET_KEY`, l'abonnement n'est pas contrôlé côté serveur (seulement dans l'app). Au démarrage,
+le serveur indique dans ses logs ce qui est actif.
+
+**Ordre de mise en service recommandé** (pour ne jamais casser une version de l'app déjà installée ou en
+cours de validation chez Apple) :
+
+1. Déployer ce serveur avec `SUPABASE_URL` (+ `REVENUECAT_SECRET_KEY`), **sans** `AI_STRICT` : les anciennes
+   versions de l'app continuent de fonctionner, les nouvelles s'authentifient.
+2. Publier la nouvelle version de l'app et attendre qu'elle soit approuvée et adoptée.
+3. Ajouter `AI_STRICT=true` : le serveur n'accepte plus que les comptes connectés. Les anciennes versions
+   afficheront une erreur (la mise à jour de l'app devient nécessaire).
+
+Tests : `npm test` (vérification des jetons avec une vraie paire de clés locale, abonnement, limites, modes).

@@ -8,7 +8,6 @@ import { DateValue, DateWheelPicker, defaultDateValue } from '@/components/DateW
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, ScreenIntro } from '@/components/Common';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Screen } from '@/components/Screen';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { getSigne } from '@/lib/astrology';
 import { colors } from '@/theme/colors';
@@ -42,7 +41,7 @@ export default function CompatScreen() {
     const autreSigne = getSigne(date.month, date.day);
     const prompt = `${profile.prenom} (signe : ${profile.signe}) souhaite connaître sa compatibilité avec ${autrePrenom.trim()} (signe : ${autreSigne}). Rédige une lecture de compatibilité entre ces deux signes, en évoquant à la fois les affinités naturelles et les points de vigilance possibles dans la relation.`;
     try {
-      const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(prompt, 'general');
       const entry = await addJournalEntry('compat', `${profile.prenom} & ${autrePrenom.trim()}`, text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

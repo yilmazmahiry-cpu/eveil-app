@@ -6,7 +6,6 @@ import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
 import { Screen } from '@/components/Screen';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { CHEMIN_VIE_TEXTS } from '@/lib/numerology';
 import { colors } from '@/theme/colors';
@@ -31,7 +30,7 @@ export default function NumeroScreen() {
     setResult(null);
     const prompt = `${profile.prenom}, signe ${profile.signe}. Chemin de vie : ${profile.cheminVie}. Nombre d'expression : ${profile.nombreExpression}. Nombre de l'âme : ${profile.nombreAme}. Nombre de personnalité : ${profile.nombrePersonnalite}. Rédige une lecture numérologique complète et personnalisée qui relie ces quatre nombres entre eux.`;
     try {
-      const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(prompt, 'general');
       const entry = await addJournalEntry('numero', 'Lecture complète', text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

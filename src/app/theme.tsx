@@ -6,7 +6,6 @@ import { askIA } from '@/api/ai';
 import { PrimaryButton } from '@/components/Buttons';
 import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader } from '@/components/Common';
 import { Screen } from '@/components/Screen';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { useProfile } from '@/context/ProfileContext';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -42,7 +41,7 @@ export default function ThemeScreen() {
         " Rédige une lecture de thème astral inspirée pour cette personne à partir de ces informations. Précise dès la première phrase qu'il s'agit d'une interprétation générale et non d'un calcul astronomique précis de la carte du ciel.";
     }
     try {
-      const text = await askIA(details, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(details, 'general');
       const entry = await addJournalEntry('theme', 'Thème astral', text);
       setResult({ id: entry.id, text, feedback: null });
     } catch {

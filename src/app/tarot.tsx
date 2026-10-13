@@ -8,7 +8,6 @@ import { ErrorPanel, FeedbackWidget, LoadingDots, ResultPanel, ScreenHeader, Scr
 import { OracleCardVisual } from '@/components/OracleCardVisual';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
-import { SYSTEM_PROMPT_GENERAL } from '@/data/prompts';
 import { SUIT_LABELS, TAROT_DECK, TarotCard } from '@/data/tarotCards';
 import { getDailyCache, setDailyCache } from '@/lib/dailyCache';
 import { colors } from '@/theme/colors';
@@ -62,7 +61,7 @@ export default function TarotScreen() {
     const suitPart = card.suit ? ` (arcane mineur, ${SUIT_LABELS[card.suit]})` : ' (arcane majeur)';
     const prompt = `${profile.prenom} (signe : ${profile.signe}) tire la carte de tarot "${card.name}"${suitPart}, en position ${orientation.toLowerCase()}. Sens traditionnel : ${meaning} Propose une lecture personnalisée de cette carte pour cette personne aujourd'hui.`;
     try {
-      const text = await askIA(prompt, SYSTEM_PROMPT_GENERAL);
+      const text = await askIA(prompt, 'general');
       const entry = await addJournalEntry('tarot', `${card.name} — ${orientation}`, text);
       setResult({ id: entry.id, text, feedback: null });
       const next = count + 1;
