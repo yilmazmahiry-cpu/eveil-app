@@ -8,6 +8,7 @@ import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
+import { isOldEnough, MIN_AGE } from '@/lib/age';
 import { buildProfile } from '@/lib/buildProfile';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -32,18 +33,27 @@ export default function OnboardingScreen() {
       return;
     }
     Keyboard.dismiss();
+    const naissance = dateValueToISO(date);
+    if (!isOldEnough(naissance)) {
+      setError(`Éveil est réservé aux personnes de ${MIN_AGE} ans et plus.`);
+      return;
+    }
     setError('');
     setSubmitting(true);
-    const naissance = dateValueToISO(date);
-    const profile = await buildProfile({
-      prenom: prenom.trim(),
-      nom: nom.trim(),
-      naissance,
-      heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
-      lieuNaissance: lieu.trim() || null,
-    });
-    await saveProfile(profile);
-    router.replace('/(tabs)');
+    try {
+      const profile = await buildProfile({
+        prenom: prenom.trim(),
+        nom: nom.trim(),
+        naissance,
+        heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
+        lieuNaissance: lieu.trim() || null,
+      });
+      await saveProfile(profile);
+      router.replace('/(tabs)');
+    } catch {
+      setError('Impossible d’enregistrer ton profil. Vérifie ta connexion et réessaie.');
+      setSubmitting(false);
+    }
   };
 
   return (

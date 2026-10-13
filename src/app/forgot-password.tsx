@@ -7,6 +7,7 @@ import { PrimaryButton } from '@/components/Buttons';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
+import { translateAuthError } from '@/lib/authErrors';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -30,7 +31,7 @@ export default function ForgotPasswordScreen() {
     });
     setSubmitting(false);
     if (resetError) {
-      setError(resetError.message);
+      setError(translateAuthError(resetError.message, 'Impossible d’envoyer le lien pour l’instant. Réessaie dans un instant.'));
       return;
     }
     setSent(true);

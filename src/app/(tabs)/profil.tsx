@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Keyboard, StyleSheet, Text, View } from 'react-native';
+import { Keyboard, Linking, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton, TextButton } from '@/components/Buttons';
 import {
@@ -16,10 +16,13 @@ import { LogoGlow } from '@/components/LogoGlow';
 import { NotificationSettings } from '@/components/NotificationSettings';
 import { Screen } from '@/components/Screen';
 import { useProfile } from '@/context/ProfileContext';
+import { isOldEnough, MIN_AGE } from '@/lib/age';
 import { buildProfile } from '@/lib/buildProfile';
 import { formatDateLongFR } from '@/lib/format';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
+
+const TERMS_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
 
 export default function ProfilScreen() {
   const { profile, saveProfile, deleteProfile, signOut } = useProfile();
@@ -66,6 +69,17 @@ export default function ProfilScreen() {
 
       <PrimaryButton title="Modifier mes informations" onPress={() => setEditing(true)} style={{ marginTop: 22 }} />
       <TextButton title="Se déconnecter" onPress={() => signOut()} style={{ marginTop: 14 }} />
+
+      <View style={styles.legalRow}>
+        <Text style={styles.legalLink} onPress={() => router.push('/privacy')}>
+          Politique de confidentialité
+        </Text>
+        <Text style={styles.legalSep}>·</Text>
+        <Text style={styles.legalLink} onPress={() => Linking.openURL(TERMS_URL)}>
+          Conditions d’utilisation
+        </Text>
+      </View>
+
       <TextButton
         title="Supprimer mon compte"
         color={colors.alert}
@@ -79,6 +93,10 @@ export default function ProfilScreen() {
             <Text style={styles.confirmText}>
               Cette action supprime définitivement ton compte, ton profil, ton journal et tes gratitudes, sans
               possibilité de retour en arrière. Tu devras créer un nouveau compte pour réutiliser Éveil.
+            </Text>
+            <Text style={[styles.confirmText, { marginTop: 8 }]}>
+              Si tu as un abonnement Éveil Premium, il n’est pas résilié automatiquement : pense à l’annuler dans les
+              réglages de ton compte Apple (Réglages, ton nom, Abonnements).
             </Text>
             {deleteError ? <Text style={[styles.confirmText, { color: colors.alert, marginTop: 8 }]}>Une erreur est survenue, réessaie.</Text> : null}
           </View>
@@ -123,7 +141,7 @@ function ProfilEditForm({
 }: {
   initial: import('@/types').Profile;
   onCancel: () => void;
-  onSave: (p: import('@/types').Profile) => void;
+  onSave: (p: import('@/types').Profile) => Promise<void>;
 }) {
   const [prenom, setPrenom] = useState(initial.prenom);
   const [nom, setNom] = useState(initial.nom);
@@ -135,23 +153,34 @@ function ProfilEditForm({
       : { hour: '', minute: '' }
   );
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const handleSave = async () => {
     if (!prenom.trim()) return;
     Keyboard.dismiss();
-    setSaving(true);
     const naissance = dateValueToISO(date);
-    const profile = await buildProfile(
-      {
-        prenom: prenom.trim(),
-        nom: nom.trim(),
-        naissance,
-        heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
-        lieuNaissance: lieu.trim() || null,
-      },
-      initial
-    );
-    onSave(profile);
+    if (!isOldEnough(naissance)) {
+      setSaveError(`Éveil est réservé aux personnes de ${MIN_AGE} ans et plus.`);
+      return;
+    }
+    setSaveError('');
+    setSaving(true);
+    try {
+      const profile = await buildProfile(
+        {
+          prenom: prenom.trim(),
+          nom: nom.trim(),
+          naissance,
+          heureNaissance: time.hour && time.minute ? `${time.hour}:${time.minute}` : null,
+          lieuNaissance: lieu.trim() || null,
+        },
+        initial
+      );
+      await onSave(profile);
+    } catch {
+      setSaveError('Impossible d’enregistrer tes informations. Vérifie ta connexion et réessaie.');
+      setSaving(false);
+    }
   };
 
   return (
@@ -193,6 +222,8 @@ function ProfilEditForm({
         />
       </LabeledField>
 
+      {saveError ? <Text style={styles.saveError}>{saveError}</Text> : null}
+
       <View style={styles.editActions}>
         <PrimaryButton title="Enregistrer" onPress={handleSave} loading={saving} style={{ flex: 1, marginTop: 0 }} />
         <TextButton title="Annuler" onPress={onCancel} style={{ marginTop: 0 }} />
@@ -222,4 +253,8 @@ const styles = StyleSheet.create({
   confirmText: { fontFamily: fonts.sans, fontSize: 13.5, color: colors.ink },
   confirmActions: { flexDirection: 'row', gap: 10, marginTop: 12, alignItems: 'center' },
   editActions: { flexDirection: 'row', gap: 10, alignItems: 'center', marginTop: 18 },
+  saveError: { fontFamily: fonts.sans, fontSize: 13, color: colors.alert },
+  legalRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 18 },
+  legalLink: { fontFamily: fonts.sans, fontSize: 12, color: colors.inkMuted, textDecorationLine: 'underline' },
+  legalSep: { fontFamily: fonts.sans, fontSize: 12, color: colors.inkMuted },
 });

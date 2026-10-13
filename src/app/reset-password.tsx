@@ -8,6 +8,7 @@ import { PrimaryButton } from '@/components/Buttons';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
+import { translateAuthError } from '@/lib/authErrors';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -51,7 +52,7 @@ export default function ResetPasswordScreen() {
     const { error: updateError } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
     if (updateError) {
-      setError(updateError.message);
+      setError(translateAuthError(updateError.message, 'Impossible de changer ton mot de passe pour l’instant. Réessaie dans un instant.'));
       return;
     }
     router.replace('/');

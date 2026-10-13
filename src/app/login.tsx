@@ -6,6 +6,7 @@ import { PrimaryButton } from '@/components/Buttons';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
+import { translateAuthError } from '@/lib/authErrors';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -31,11 +32,7 @@ export default function LoginScreen() {
     });
     setSubmitting(false);
     if (signInError) {
-      const translations: Record<string, string> = {
-        'Invalid login credentials': 'Email ou mot de passe incorrect.',
-        'Email not confirmed': 'Ton email n’est pas encore confirmé. Vérifie ta boîte mail et clique sur le lien reçu.',
-      };
-      setError(translations[signInError.message] ?? signInError.message);
+      setError(translateAuthError(signInError.message, 'Connexion impossible pour l’instant. Réessaie dans un instant.'));
       return;
     }
     router.replace('/');

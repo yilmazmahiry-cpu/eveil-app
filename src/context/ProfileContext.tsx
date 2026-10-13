@@ -33,13 +33,19 @@ type ProfileContextValue = {
   toggleRealized: (id: string) => Promise<void>;
   setFeedback: (id: string, feedback: 'up' | 'down') => Promise<void>;
   getCurrentIntention: () => JournalEntry | null;
+  profileError: boolean;
+  reloadProfile: () => void;
   isPremium: boolean;
   offering: PurchasesOffering | null;
+  offeringState: 'loading' | 'ready' | 'error';
+  reloadOffering: () => void;
   purchasePackage: (pkg: PurchasesPackage) => Promise<void>;
   restorePurchases: () => Promise<void>;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
+
+const OFFERING_TIMEOUT_MS = 12000;
 
 function rowToEntry(row: any): JournalEntry {
   return {
@@ -62,13 +68,37 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [streak, setStreak] = useState<Streak>({ count: 0, lastDate: null });
   const [isPremium, setIsPremium] = useState(false);
   const [offering, setOffering] = useState<PurchasesOffering | null>(null);
+  const [offeringState, setOfferingState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [profileError, setProfileError] = useState(false);
+  const [profileReloadKey, setProfileReloadKey] = useState(0);
+
+  const fetchOffering = useCallback(async () => {
+    try {
+      const current = await Promise.race([
+        getCurrentOffering(),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), OFFERING_TIMEOUT_MS)),
+      ]);
+      setOffering(current);
+      setOfferingState(current?.monthly && current?.annual ? 'ready' : 'error');
+    } catch {
+      setOfferingState('error');
+    }
+  }, []);
+
+  const reloadOffering = useCallback(() => {
+    setOfferingState('loading');
+    fetchOffering();
+  }, [fetchOffering]);
+
+  const reloadProfile = useCallback(() => setProfileReloadKey((k) => k + 1), []);
 
   // RevenueCat: configure once, then listen for entitlement changes.
   useEffect(() => {
     configurePurchases();
-    getCurrentOffering().then(setOffering);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- chargement initial depuis un service externe : l'état n'est mis à jour qu'après la réponse
+    fetchOffering();
     return onCustomerInfoUpdate((info) => setIsPremium(isPremiumFromInfo(info)));
-  }, []);
+  }, [fetchOffering]);
 
   // Session bootstrap + subscription.
   useEffect(() => {
@@ -79,6 +109,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, next) => {
       setSession(next);
       if (!next) {
+        setProfileError(false);
         setProfile(null);
         setJournal([]);
         setStreak({ count: 0, lastDate: null });
@@ -107,16 +138,28 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- switching users must show a loading state immediately, not after the fetch resolves
     setLoading(true);
     (async () => {
-      const uid = session.user.id;
-      const [{ data: profileRow }, { data: journalRows }] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', uid).maybeSingle(),
-        supabase.from('journal_entries').select('*').eq('user_id', uid).order('date', { ascending: false }).limit(20),
-      ]);
-      setProfile(profileRow ? rowToProfile(profileRow) : null);
-      setJournal((journalRows ?? []).map(rowToEntry));
+      setProfileError(false);
+      try {
+        const uid = session.user.id;
+        const [profileRes, journalRes] = await Promise.all([
+          supabase.from('profiles').select('*').eq('id', uid).maybeSingle(),
+          supabase.from('journal_entries').select('*').eq('user_id', uid).order('date', { ascending: false }).limit(20),
+        ]);
+        // Un échec réseau ne doit pas être pris pour "pas de profil" : on afficherait l'onboarding
+        // et l'utilisateur pourrait écraser son profil existant.
+        if (profileRes.error) {
+          setProfileError(true);
+          setLoading(false);
+          return;
+        }
+        setProfile(profileRes.data ? rowToProfile(profileRes.data) : null);
+        setJournal((journalRes.data ?? []).map(rowToEntry));
+      } catch {
+        setProfileError(true);
+      }
       setLoading(false);
     })();
-  }, [session]);
+  }, [session, profileReloadKey]);
 
   // Streak bump, once a profile exists for the session.
   useEffect(() => {
@@ -140,7 +183,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     async (next: Profile) => {
       if (!session) return;
       const uid = session.user.id;
-      await supabase.from('profiles').upsert({ id: uid, ...profileToRow(next) });
+      const { error } = await supabase.from('profiles').upsert({ id: uid, ...profileToRow(next) });
+      if (error) throw error;
       setProfile(next);
     },
     [session]
@@ -243,8 +287,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       toggleRealized,
       setFeedback,
       getCurrentIntention,
+      profileError,
+      reloadProfile,
       isPremium,
       offering,
+      offeringState,
+      reloadOffering,
       purchasePackage,
       restorePurchases,
     }),
@@ -263,8 +311,12 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       toggleRealized,
       setFeedback,
       getCurrentIntention,
+      profileError,
+      reloadProfile,
       isPremium,
       offering,
+      offeringState,
+      reloadOffering,
       purchasePackage,
       restorePurchases,
     ]

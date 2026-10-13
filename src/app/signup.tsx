@@ -6,6 +6,7 @@ import { PrimaryButton } from '@/components/Buttons';
 import { LabeledField, StyledTextInput } from '@/components/Fields';
 import { Logo } from '@/components/Logo';
 import { Screen } from '@/components/Screen';
+import { translateAuthError } from '@/lib/authErrors';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/theme/colors';
 import { fonts } from '@/theme/typography';
@@ -36,7 +37,7 @@ export default function SignupScreen() {
     });
     setSubmitting(false);
     if (signUpError) {
-      setError(signUpError.message);
+      setError(translateAuthError(signUpError.message, 'Impossible de créer ton compte pour l’instant. Réessaie dans un instant.'));
       return;
     }
     if (data.session) {
@@ -95,6 +96,14 @@ export default function SignupScreen() {
 
       <PrimaryButton title="Créer mon compte" onPress={handleSubmit} loading={submitting} />
 
+      <Text style={styles.footnote}>
+        En créant un compte, tu confirmes avoir au moins 16 ans et tu acceptes notre{' '}
+        <Link href="/privacy" style={styles.footnoteLink}>
+          politique de confidentialité
+        </Link>
+        .
+      </Text>
+
       <Link href="/login" replace style={styles.link}>
         J’ai déjà un compte
       </Link>
@@ -108,4 +117,6 @@ const styles = StyleSheet.create({
   subtitle: { fontFamily: fonts.sans, fontSize: 14, lineHeight: 21, color: colors.inkMuted, marginBottom: 6 },
   error: { color: colors.alert, fontFamily: fonts.sans, fontSize: 13 },
   link: { fontFamily: fonts.sansBold, fontSize: 13.5, color: colors.gold, marginTop: 8, textAlign: 'center' },
+  footnote: { fontFamily: fonts.sans, fontSize: 12, lineHeight: 18, color: colors.inkMuted, textAlign: 'center' },
+  footnoteLink: { fontFamily: fonts.sans, fontSize: 12, color: colors.gold, textDecorationLine: 'underline' },
 });

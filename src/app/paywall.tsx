@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PurchasesPackage } from 'react-native-purchases';
 
 import { PrimaryButton, TextButton } from '@/components/Buttons';
@@ -17,10 +17,19 @@ const FEATURES = [
 
 export default function PaywallScreen() {
   const router = useRouter();
-  const { offering, purchasePackage, restorePurchases } = useProfile();
+  const { offering, offeringState, reloadOffering, purchasePackage, restorePurchases } = useProfile();
   const [selected, setSelected] = useState<'annual' | 'monthly'>('annual');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Si les offres n'ont pas pu être chargées au démarrage de l'app, on retente une fois à l'ouverture.
+  const retriedOnOpen = useRef(false);
+  useEffect(() => {
+    if (offeringState === 'error' && !retriedOnOpen.current) {
+      retriedOnOpen.current = true;
+      reloadOffering();
+    }
+  }, [offeringState, reloadOffering]);
 
   const monthly = offering?.monthly ?? null;
   const annual = offering?.annual ?? null;
@@ -91,6 +100,13 @@ export default function PaywallScreen() {
             <Text style={styles.planSub}>par mois</Text>
           </Pressable>
         </View>
+      ) : offeringState === 'error' ? (
+        <View>
+          <Text style={styles.loadingOfferings}>
+            Impossible de charger les offres pour le moment. Vérifie ta connexion internet puis réessaie.
+          </Text>
+          <TextButton title="Réessayer" onPress={reloadOffering} style={{ alignSelf: 'center', marginTop: 10 }} />
+        </View>
       ) : (
         <Text style={styles.loadingOfferings}>Chargement des offres…</Text>
       )}
@@ -117,7 +133,7 @@ export default function PaywallScreen() {
       </View>
       <Text style={styles.disclaimer}>
         Le paiement est débité à la fin de l’essai gratuit sauf annulation au moins 24h avant. Résiliable à tout
-        moment dans les réglages de ton compte {`{App Store / Google Play}`}.
+        moment dans les réglages de ton compte {Platform.OS === 'android' ? 'Google Play' : 'Apple'}.
       </Text>
     </Screen>
   );
