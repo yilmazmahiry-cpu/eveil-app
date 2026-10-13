@@ -134,7 +134,13 @@ function BilanContent({ bilan, streakCount }: { bilan: Bilan; streakCount: numbe
 
 function PeriodTab({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={[styles.periodTab, active && styles.periodTabActive]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      style={[styles.periodTab, active && styles.periodTabActive]}
+    >
       <Text style={[styles.periodLabel, active && styles.periodLabelActive]}>{label}</Text>
     </Pressable>
   );

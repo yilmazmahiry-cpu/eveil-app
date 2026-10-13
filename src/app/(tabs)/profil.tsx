@@ -71,11 +71,11 @@ export default function ProfilScreen() {
       <TextButton title="Se déconnecter" onPress={() => signOut()} style={{ marginTop: 14 }} />
 
       <View style={styles.legalRow}>
-        <Text style={styles.legalLink} onPress={() => router.push('/privacy')}>
+        <Text style={styles.legalLink} accessibilityRole="link" onPress={() => router.push('/privacy')}>
           Politique de confidentialité
         </Text>
         <Text style={styles.legalSep}>·</Text>
-        <Text style={styles.legalLink} onPress={() => Linking.openURL(TERMS_URL)}>
+        <Text style={styles.legalLink} accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)}>
           Conditions d’utilisation
         </Text>
       </View>

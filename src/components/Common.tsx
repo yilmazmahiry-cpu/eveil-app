@@ -11,7 +11,13 @@ export function ScreenHeader({ title, onBack }: { title: string; onBack?: () => 
   const router = useRouter();
   return (
     <View style={styles.headerRow}>
-      <Pressable style={styles.backBtn} onPress={onBack ?? (() => router.back())} hitSlop={10}>
+      <Pressable
+        style={styles.backBtn}
+        onPress={onBack ?? (() => router.back())}
+        hitSlop={10}
+        accessibilityRole="button"
+        accessibilityLabel="Retour"
+      >
         <BackIcon />
       </Pressable>
       <Text style={styles.headerTitle}>{title}</Text>
@@ -82,12 +88,18 @@ export function FeedbackWidget({
         <Pressable
           style={[styles.feedbackBtn, value === 'up' && styles.feedbackBtnActive]}
           onPress={() => onChange('up')}
+          accessibilityRole="button"
+          accessibilityLabel="Cette lecture m’a parlé"
+          accessibilityState={{ selected: value === 'up' }}
         >
           <ThumbIcon color={value === 'up' ? colors.gold : colors.inkMuted} />
         </Pressable>
         <Pressable
           style={[styles.feedbackBtn, value === 'down' && styles.feedbackBtnActive]}
           onPress={() => onChange('down')}
+          accessibilityRole="button"
+          accessibilityLabel="Cette lecture ne m’a pas parlé"
+          accessibilityState={{ selected: value === 'down' }}
         >
           <ThumbIcon down color={value === 'down' ? colors.gold : colors.inkMuted} />
         </Pressable>
@@ -98,7 +110,13 @@ export function FeedbackWidget({
 
 export function FavoriteButton({ active, onPress }: { active: boolean; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} hitSlop={8}>
+    <Pressable
+      onPress={onPress}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel={active ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+      accessibilityState={{ selected: active }}
+    >
       <StarIcon filled={active} color={colors.gold} />
     </Pressable>
   );

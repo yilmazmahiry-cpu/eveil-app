@@ -62,7 +62,12 @@ export default function PaywallScreen() {
 
   return (
     <Screen contentContainerStyle={styles.content}>
-      <Pressable onPress={() => router.back()} style={styles.close}>
+      <Pressable
+        onPress={() => router.back()}
+        style={styles.close}
+        accessibilityRole="button"
+        accessibilityLabel="Fermer"
+      >
         <Text style={styles.closeText}>✕</Text>
       </Pressable>
 
@@ -82,6 +87,9 @@ export default function PaywallScreen() {
         <View style={styles.plans}>
           <Pressable
             onPress={() => setSelected('annual')}
+            accessibilityRole="radio"
+            accessibilityLabel={`Annuel, ${annual.product.priceString}, meilleure offre`}
+            accessibilityState={{ selected: selected === 'annual' }}
             style={[styles.plan, selected === 'annual' && styles.planActive]}
           >
             <View style={styles.planBadge}>
@@ -93,6 +101,9 @@ export default function PaywallScreen() {
           </Pressable>
           <Pressable
             onPress={() => setSelected('monthly')}
+            accessibilityRole="radio"
+            accessibilityLabel={`Mensuel, ${monthly.product.priceString} par mois`}
+            accessibilityState={{ selected: selected === 'monthly' }}
             style={[styles.plan, selected === 'monthly' && styles.planActive]}
           >
             <Text style={styles.planLabel}>Mensuel</Text>
@@ -123,11 +134,15 @@ export default function PaywallScreen() {
       <TextButton title="Restaurer mes achats" onPress={handleRestore} style={{ alignSelf: 'center', marginTop: 4 }} />
 
       <View style={styles.legalRow}>
-        <Text style={styles.legalLink} onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+        <Text
+          style={styles.legalLink}
+          accessibilityRole="link"
+          onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
+        >
           Conditions d’utilisation
         </Text>
         <Text style={styles.legalSep}>·</Text>
-        <Text style={styles.legalLink} onPress={() => router.push('/privacy')}>
+        <Text style={styles.legalLink} accessibilityRole="link" onPress={() => router.push('/privacy')}>
           Confidentialité
         </Text>
       </View>

@@ -56,7 +56,11 @@ export default function JournalScreen() {
               <Text style={styles.logoWord}>Éveil</Text>
             </View>
             <Text style={styles.title}>Ton journal</Text>
-            <Pressable onPress={() => router.push('/bilan')}>
+            <Pressable
+              onPress={() => router.push('/bilan')}
+              accessibilityRole="button"
+              accessibilityLabel="Ton bilan. Tes rituels, les mots qui reviennent et ta progression."
+            >
               <Card style={{ marginBottom: 14 }}>
                 <Text style={styles.cardTitle}>Ton bilan</Text>
                 <Text style={styles.cardText}>Tes rituels, les mots qui reviennent et ta progression.</Text>
@@ -90,7 +94,13 @@ export default function JournalScreen() {
 
 function FilterTab({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} style={[styles.filterTab, active && styles.filterTabActive]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected: active }}
+      style={[styles.filterTab, active && styles.filterTabActive]}
+    >
       <Text style={[styles.filterTabLabel, active && styles.filterTabLabelActive]}>{label}</Text>
     </Pressable>
   );

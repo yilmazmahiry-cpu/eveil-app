@@ -50,6 +50,7 @@ export function NotificationSettings() {
           <Text style={styles.subtitle}>Une notification pour ne pas manquer ta carte du jour.</Text>
         </View>
         <Switch
+          accessibilityLabel="Rappel quotidien"
           value={profile.notifEnabled}
           onValueChange={handleToggle}
           trackColor={{ false: 'rgba(255,255,255,0.15)', true: colors.goldBorderStrong }}
@@ -69,6 +70,9 @@ export function NotificationSettings() {
             <Pressable
               key={p.hour}
               onPress={() => handlePickHour(p.hour)}
+              accessibilityRole="radio"
+              accessibilityLabel={p.label}
+              accessibilityState={{ selected: profile.notifHour === p.hour }}
               style={[styles.preset, profile.notifHour === p.hour && styles.presetActive]}
             >
               <Text style={[styles.presetLabel, profile.notifHour === p.hour && styles.presetLabelActive]}>{p.label}</Text>

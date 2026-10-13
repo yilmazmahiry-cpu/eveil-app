@@ -21,6 +21,9 @@ export function PrimaryButton({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       style={[styles.primary, isDisabled && styles.primaryDisabled, style]}
     >
       {loading ? (
@@ -42,7 +45,7 @@ export function SecondaryButton({
   style?: object;
 }) {
   return (
-    <Pressable onPress={onPress} style={[styles.secondary, style]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={title} style={[styles.secondary, style]}>
       <Text style={styles.secondaryText}>{title}</Text>
     </Pressable>
   );
@@ -60,7 +63,7 @@ export function TextButton({
   style?: object;
 }) {
   return (
-    <Pressable onPress={onPress} style={[styles.textBtn, style]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={title} style={[styles.textBtn, style]}>
       <Text style={[styles.textBtnLabel, color ? { color } : null]}>{title}</Text>
     </Pressable>
   );

@@ -23,6 +23,8 @@ export function Tile({
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={[title, bigValue, subtitle].filter((part) => part !== undefined && part !== '').join('. ')}
       style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]}
     >
       {bigValue !== undefined ? (
