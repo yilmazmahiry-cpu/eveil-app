@@ -5,18 +5,29 @@
 // { systemPrompt, userPrompt } et renvoie { text }, en appelant l'API Anthropic
 // avec la clé stockée en variable d'environnement serveur).
 
+import { getMemoryContext } from '@/lib/memory';
+import { cleanAIText } from '@/lib/textClean';
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export async function askIA(userPrompt: string, systemPrompt: string): Promise<string> {
+export async function askIA(
+  userPrompt: string,
+  systemPrompt: string,
+  options: { withMemory?: boolean } = {}
+): Promise<string> {
   if (!API_URL) {
     throw new Error(
       "Aucun backend configuré (EXPO_PUBLIC_API_URL manquant). Voir README pour brancher le serveur."
     );
   }
+  const memory = options.withMemory === false ? '' : await getMemoryContext();
   const response = await fetch(`${API_URL}/api/ai`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ systemPrompt, userPrompt }),
+    body: JSON.stringify({
+      systemPrompt: memory ? `${systemPrompt}\n\n${memory}` : systemPrompt,
+      userPrompt,
+    }),
   });
   if (!response.ok) {
     throw new Error(`Erreur serveur (${response.status})`);
@@ -25,5 +36,5 @@ export async function askIA(userPrompt: string, systemPrompt: string): Promise<s
   if (!data || typeof data.text !== 'string') {
     throw new Error('Réponse invalide');
   }
-  return data.text.trim();
+  return cleanAIText(data.text);
 }

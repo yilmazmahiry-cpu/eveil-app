@@ -25,7 +25,7 @@ const SECTIONS: { title: string; body: string }[] = [
   {
     title: '3. Avec qui nous partageons des données',
     body:
-      'Supabase (base de données et authentification, UE), Anthropic (génère tes lectures à partir de ton prénom, signe et saisies — jamais ton email ni ton mot de passe), Render (héberge notre serveur), Expo (envoi des notifications), RevenueCat (gestion de l’abonnement), Apple (App Store, paiement), OpenStreetMap / Nominatim (convertit ta ville de naissance en coordonnées, si renseignée).\n\n' +
+      'Supabase (base de données et authentification, UE), Anthropic (génère tes lectures à partir de ton prénom, signe, saisies et d’un court résumé de tes intentions et gratitudes récentes — jamais ton email ni ton mot de passe), Render (héberge notre serveur), Expo (envoi des notifications), RevenueCat (gestion de l’abonnement), Apple (App Store, paiement), OpenStreetMap / Nominatim (convertit ta ville de naissance en coordonnées, si renseignée).\n\n' +
       'Aucun de ces prestataires n’est autorisé à utiliser tes données à ses propres fins.',
   },
   {
@@ -59,7 +59,7 @@ export default function PrivacyScreen() {
     <Screen contentContainerStyle={styles.container}>
       <ScreenHeader title="Confidentialité" />
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <Text style={styles.updated}>Dernière mise à jour : 29 septembre 2026</Text>
+        <Text style={styles.updated}>Dernière mise à jour : 13 octobre 2026</Text>
         {SECTIONS.map((s) => (
           <View key={s.title} style={styles.section}>
             <Text style={styles.sectionTitle}>{s.title}</Text>

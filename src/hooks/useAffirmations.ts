@@ -24,7 +24,7 @@ export function useAffirmations(profile: Profile) {
       setError(false);
       const prompt = `Rédige 10 affirmations positives courtes et variées, dans l'esprit de la loi de l'attraction, personnalisées pour ${profile.prenom} (signe : ${profile.signe}). Chaque affirmation est une phrase à la première personne ("je..."), au présent, sur des thèmes différents (confiance en soi, abondance, amour, sérénité, réussite...). Réponds uniquement par la liste, une affirmation par ligne, sans numérotation, sans tirets, sans introduction ni conclusion.`;
       try {
-        const text = await askIA(prompt, SYSTEM_PROMPT_AFFIRMATIONS);
+        const text = await askIA(prompt, SYSTEM_PROMPT_AFFIRMATIONS, { withMemory: false });
         const nextList = text
           .split('\n')
           .map((l) => l.trim().replace(/^[-•\d.)\s]+/, ''))

@@ -15,6 +15,7 @@ import {
   restorePurchases as restorePurchasesSdk,
 } from '@/lib/purchases';
 import { supabase } from '@/lib/supabase';
+import { cleanAIText } from '@/lib/textClean';
 import { GratitudeEntry, JournalEntry, JournalType, Profile, Streak } from '@/types';
 
 type ProfileContextValue = {
@@ -45,7 +46,7 @@ function rowToEntry(row: any): JournalEntry {
     id: row.id,
     type: row.type,
     input: row.input,
-    result: row.result,
+    result: cleanAIText(row.result),
     date: row.date,
     fav: row.fav,
     feedback: row.feedback,
