@@ -16,6 +16,7 @@ import {
 } from '@/lib/purchases';
 import { supabase } from '@/lib/supabase';
 import { cleanAIText } from '@/lib/textClean';
+import { syncTimeZone } from '@/lib/timezone';
 import { GratitudeEntry, JournalEntry, JournalType, Profile, Streak } from '@/types';
 
 type ProfileContextValue = {
@@ -154,6 +155,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         }
         setProfile(profileRes.data ? rowToProfile(profileRes.data) : null);
         setJournal((journalRes.data ?? []).map(rowToEntry));
+        if (profileRes.data) syncTimeZone(uid);
       } catch {
         setProfileError(true);
       }
@@ -186,6 +188,7 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.from('profiles').upsert({ id: uid, ...profileToRow(next) });
       if (error) throw error;
       setProfile(next);
+      syncTimeZone(uid);
     },
     [session]
   );

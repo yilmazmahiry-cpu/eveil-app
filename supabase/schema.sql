@@ -24,6 +24,7 @@ create table profiles (
   notif_hour int not null default 9,
   invite_code text unique,
   push_token text,
+  timezone text, -- fuseau IANA de l'appareil (ex. "Europe/Paris"), pour envoyer la notification à l'heure locale
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -12,7 +12,6 @@ import { fonts } from '@/theme/typography';
 const FEATURES = [
   'Lectures illimitées : Heures miroir, Rêve, Signe, Thème astral, Compatibilité, Manifestation, Arbre de vie',
   'Tarot : 5 lectures personnalisées par jour',
-  'Notifications avec le vrai contenu de ta carte du jour',
 ];
 
 export default function PaywallScreen() {

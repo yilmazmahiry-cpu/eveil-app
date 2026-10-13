@@ -17,29 +17,50 @@ const PRESETS = [
 export function NotificationSettings() {
   const { profile, saveProfile, savePushToken } = useProfile();
   const [denied, setDenied] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   if (!profile) return null;
 
-  const handleToggle = async (enabled: boolean) => {
-    if (enabled) {
-      const granted = await requestNotificationPermission();
-      if (!granted) {
-        setDenied(true);
-        return;
-      }
-      setDenied(false);
-      await scheduleDailyReminder(profile.notifHour, 0);
-      const token = await getExpoPushToken();
-      if (token) await savePushToken(token);
-    } else {
+  // Un seul rappel par jour : la notification du serveur (avec le nom de la carte) quand on a un jeton,
+  // sinon un rappel local générique en secours.
+  const applyReminder = async (hour: number) => {
+    const token = await getExpoPushToken();
+    if (token) {
+      await savePushToken(token);
       await cancelDailyReminder();
+    } else {
+      await scheduleDailyReminder(hour, 0);
     }
-    await saveProfile({ ...profile, notifEnabled: enabled });
+  };
+
+  const handleToggle = async (enabled: boolean) => {
+    setSaveFailed(false);
+    try {
+      if (enabled) {
+        const granted = await requestNotificationPermission();
+        if (!granted) {
+          setDenied(true);
+          return;
+        }
+        setDenied(false);
+        await applyReminder(profile.notifHour);
+      } else {
+        await cancelDailyReminder();
+      }
+      await saveProfile({ ...profile, notifEnabled: enabled });
+    } catch {
+      setSaveFailed(true);
+    }
   };
 
   const handlePickHour = async (hour: number) => {
-    await saveProfile({ ...profile, notifHour: hour });
-    if (profile.notifEnabled) await scheduleDailyReminder(hour, 0);
+    setSaveFailed(false);
+    try {
+      await saveProfile({ ...profile, notifHour: hour });
+      if (profile.notifEnabled) await applyReminder(hour);
+    } catch {
+      setSaveFailed(true);
+    }
   };
 
   return (
@@ -62,6 +83,10 @@ export function NotificationSettings() {
         <Text style={styles.denied}>
           Notifications refusées. Autorise-les dans les réglages de ton téléphone pour activer le rappel.
         </Text>
+      ) : null}
+
+      {saveFailed ? (
+        <Text style={styles.denied}>Impossible d’enregistrer ce réglage. Vérifie ta connexion et réessaie.</Text>
       ) : null}
 
       {profile.notifEnabled ? (

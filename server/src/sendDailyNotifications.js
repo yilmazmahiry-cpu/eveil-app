@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import { createClient } from '@supabase/supabase-js';
 
+import { localDateAndHour } from './localTime.js';
 import { ORACLE_CARDS } from './oracleCards.js';
 
 function simpleHash(str) {
@@ -12,12 +13,9 @@ function simpleHash(str) {
   return h;
 }
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function cardForProfile(prenom) {
-  const idx = simpleHash(todayISO() + prenom) % ORACLE_CARDS.length;
+// Même formule que l'app (date locale de l'utilisateur + prénom) pour annoncer la carte qu'il verra.
+function cardForProfile(prenom, localDate) {
+  const idx = simpleHash(localDate + prenom) % ORACLE_CARDS.length;
   return ORACLE_CARDS[idx];
 }
 
@@ -39,13 +37,13 @@ async function main() {
   }
 
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-  const currentHour = new Date().getUTCHours();
+  const now = new Date();
 
+  // L'heure choisie par l'utilisateur est son heure locale : on filtre ici, profil par profil.
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('prenom, push_token')
+    .select('prenom, push_token, notif_hour, timezone')
     .eq('notif_enabled', true)
-    .eq('notif_hour', currentHour)
     .not('push_token', 'is', null);
 
   if (error) {
@@ -53,13 +51,15 @@ async function main() {
     process.exit(1);
   }
 
-  if (!profiles || profiles.length === 0) {
-    console.log(`Aucun profil à notifier pour ${currentHour}h UTC.`);
+  const due = (profiles ?? []).filter((p) => localDateAndHour(now, p.timezone).hour === p.notif_hour);
+
+  if (due.length === 0) {
+    console.log(`Aucun profil à notifier (${(profiles ?? []).length} actif(s)) à ${now.toISOString()}.`);
     return;
   }
 
-  const messages = profiles.map((p) => {
-    const card = cardForProfile(p.prenom);
+  const messages = due.map((p) => {
+    const card = cardForProfile(p.prenom, localDateAndHour(now, p.timezone).date);
     return {
       to: p.push_token,
       title: 'Éveil',
@@ -73,7 +73,7 @@ async function main() {
     await sendExpoPush(messages.slice(i, i + 100));
   }
 
-  console.log(`${messages.length} notification(s) envoyée(s) pour ${currentHour}h UTC.`);
+  console.log(`${messages.length} notification(s) envoyée(s) à ${now.toISOString()}.`);
 }
 
 main().catch((err) => {
